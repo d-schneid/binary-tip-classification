@@ -1,5 +1,5 @@
+import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from decimal import localcontext, Decimal, ROUND_HALF_UP
 
 
 class UserTSCVSplitter(BaseEstimator, TransformerMixin):
@@ -24,20 +24,18 @@ class UserTSCVSplitter(BaseEstimator, TransformerMixin):
         user_ts_temp = user_ts.copy()
 
         while num_remaining_orders > 0:
-            with localcontext() as ctx:
-                ctx.rounding = ROUND_HALF_UP
-                num_orders_to_assign = int(Decimal(num_remaining_orders * self.validation_set_ratio).to_integral_value())
+            num_orders_to_assign = num_remaining_orders * self.validation_set_ratio
+            if not num_orders_to_assign.is_integer():
+                num_orders_to_assign += np.random.choice([0, 1], p=[1 - self.validation_set_ratio, self.validation_set_ratio])
+            num_orders_to_assign = int(num_orders_to_assign)
 
             if num_orders_to_assign > 0:
                 idx_to_assign = user_ts_temp.index[-num_orders_to_assign:]
                 user_ts.loc[idx_to_assign, 'cv_validation_set'] = cv_validation_set
-                cv_validation_set += 1
                 user_ts_temp = user_ts_temp.iloc[:-num_orders_to_assign]
                 num_remaining_orders -= num_orders_to_assign
-            else:
-                idx_to_assign = user_ts_temp.index[-num_remaining_orders:]
-                user_ts.loc[idx_to_assign, 'cv_validation_set'] = -1
-                num_remaining_orders = 0
+
+            cv_validation_set += 1
 
         user_ts['cv_validation_set'] = user_ts['cv_validation_set'].astype(int)
         return user_ts
@@ -45,7 +43,7 @@ class UserTSCVSplitter(BaseEstimator, TransformerMixin):
     def split(self, X, y=None, groups=None):
         validation_sets = self.orders_by_user.groupby('user_id').apply(self._assign_cv_validation_set).reset_index(drop=True)
         for i in range(1, self.n_splits + 1):
-            train = X.index[(validation_sets['cv_validation_set'] > i) | (validation_sets['cv_validation_set'] == -1)].tolist()
+            train = X.index[validation_sets['cv_validation_set'] > i].tolist()
             test = X.index[validation_sets['cv_validation_set'] == i].tolist()
             yield train, test
                    
