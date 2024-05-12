@@ -40,7 +40,7 @@ class UserTSCVSplitter(BaseEstimator, TransformerMixin):
 
             cv_validation_set += 1
 
-        idx_to_assign = user_ts_temp[:num_remaining_orders]
+        idx_to_assign = user_ts_temp.index[:num_remaining_orders]
         user_ts.loc[idx_to_assign, 'cv_validation_set'] = cv_validation_set
         user_ts['cv_validation_set'] = user_ts['cv_validation_set'].astype(int)
         return user_ts
@@ -48,9 +48,11 @@ class UserTSCVSplitter(BaseEstimator, TransformerMixin):
     def split(self, X, y=None, groups=None):
         validation_sets = self.orders_by_user.groupby('user_id').apply(self._assign_cv_validation_set).reset_index(
             drop=True)
+        print(validation_sets.head(30))
         for i in range(1, self.n_splits + 1):
             train = X.index[validation_sets['cv_validation_set'] > i].tolist()
             test = X.index[validation_sets['cv_validation_set'] == i].tolist()
+            print(f"Test length: {len(test)}")
             yield train, test
 
     def get_n_splits(self, X, y, groups=None):
