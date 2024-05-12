@@ -28,8 +28,10 @@ class UserTSCVSplitter(BaseEstimator, TransformerMixin):
         while num_remaining_orders > 0 and cv_validation_set <= self.n_splits:
             num_orders_to_assign = num_remaining_orders * self.validation_set_ratio
             if not num_orders_to_assign.is_integer():
+                selection_probability = num_orders_to_assign - int(num_orders_to_assign)
                 num_orders_to_assign += np.random.choice([0, 1],
-                                                         p=[1 - self.validation_set_ratio, self.validation_set_ratio])
+                                                         p=[1 - selection_probability,
+                                                            selection_probability])
             num_orders_to_assign = int(num_orders_to_assign)
 
             if num_orders_to_assign > 0:
