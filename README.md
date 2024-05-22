@@ -5,4 +5,5 @@ to [Mural](https://app.mural.co/t/sap10/m/sap10/1716206632221/a37dd7bad0b27f9cfa
 
 ## Data Relationships
 
-![Data Relations](data\Instacart\data_relations.svg)
+![Data Relations](data/Instacart/data_relations.svg)
+
