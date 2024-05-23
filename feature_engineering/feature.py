@@ -1,25 +1,22 @@
-import numpy as np
-import pandas as pd
 from abc import ABC, abstractmethod
+
+import pandas as pd
 
 
 class Feature(ABC):
 
-    def __init__(self, op_prior, op_train, tip_train, tip_test, orders):
-        self.op_prior = op_prior
-        self.op_train = op_train
-        self.op = pd.concat([self.op_prior, self.op_train])
-
-        self.tip_train = tip_train
-        self.tip_test = tip_test
-        self.tip = pd.concat([self.tip_train, self.tip_test[['order_id', 'tip']]])
-
-        self.orders = orders
-        self.orders_tip = pd.merge(self.orders, self.tip)
+    def __init__(self, data_store, name):
+        self.data_store = data_store
+        self.orders_tip = data_store.get_orders_tip()
+        self.orders_joined = data_store.get_orders_joined()
+        self.feature = name
 
     def compute_feature(self):
         self._handle_missing_values()
         self._compute_feature()
+        if self._reference_outdated():
+            self._update_data_store()
+            self._refresh_references()
 
     def _handle_missing_values(self):
         self.orders_tip['days_since_prior_order'] = self.orders_tip['days_since_prior_order'].fillna(-1).astype(int)
@@ -35,21 +32,102 @@ class Feature(ABC):
     def _analyze_feature(self):
         pass
 
+    @abstractmethod
+    def _refresh_references(self):
+        pass
 
-class TipHistory(Feature):
+    @abstractmethod
+    def _update_data_store(self):
+        pass
 
-    def __init__(self, op_prior, op_train, tip_train, tip_test, orders):
-        super().__init__(op_prior, op_train, tip_train, tip_test, orders)
+    @abstractmethod
+    def _reference_outdated(self):
+        pass
+
+
+class StaticFeature(Feature):
+
+    def __init__(self, data_store, name):
+        super().__init__(data_store, name)
+
+    def compute_feature(self):
+        self._refresh_references()
+        if self.feature not in self.orders_tip.columns:
+            super().compute_feature()
+
+    @abstractmethod
+    def _compute_feature(self):
+        pass
+
+    @abstractmethod
+    def _analyze_feature(self):
+        pass
+
+    def _refresh_references(self):
+        self.orders_tip = self.data_store.get_orders_tip()
+        self.orders_joined = self.data_store.get_orders_joined()
+
+    def _update_data_store(self):
+        self.data_store.merge_orders_tip(self.orders_tip, self.feature)
+
+    def _reference_outdated(self):
+        return self.orders_tip is not self.data_store.get_orders_tip()
+
+
+class DynamicFeature(Feature):
+
+    def __init__(self, data_store, name):
+        super().__init__(data_store, name)
+        self.orders_tip = data_store.get_orders_tip_subset()
+        self.orders_joined = data_store.get_orders_joined_subset()
+
+    def compute_feature(self):
+        self._refresh_references()
+        super().compute_feature()
+
+    @abstractmethod
+    def _compute_feature(self):
+        pass
+
+    @abstractmethod
+    def _analyze_feature(self):
+        pass
+
+    def _refresh_references(self):
+        self.orders_tip = self.data_store.get_orders_tip_subset()
+        self.orders_joined = self.data_store.get_orders_joined_subset()
+
+    def _update_data_store(self):
+        self.data_store.merge_orders_tip_subset(self.orders_tip, self.feature)
+
+    def _reference_outdated(self):
+        return self.orders_tip is self.data_store.get_orders_tip_subset()
+
+
+class TipHistory(StaticFeature):
+
+    def __init__(self, data_store):
+        super().__init__(data_store, 'tip_history')
 
     def _compute_feature(self):
-        self.orders_tip['tip'] = self.orders_tip['tip'].astype(bool)
-        self.orders_tip['tip_history'] = (self.orders_tip.groupby('user_id')['tip'].transform('cumsum').shift(1) /
-                                          self.orders_tip['order_number'].shift(1))
+        self.orders_tip[self.feature] = (self.orders_tip.assign(tip_bool=self.orders_tip['tip'].astype(bool))
+                                         .groupby('user_id')['tip_bool']
+                                         .transform('cumsum').shift(1) / self.orders_tip['order_number'].shift(1))
+        self.orders_tip.loc[self.orders_tip['order_number'] == 1, self.feature] = -1
 
-        self.orders_tip.loc[self.orders_tip['order_number'] == 1, 'tip_history'] = -1
+    def _analyze_feature(self):
+        pass
 
-        self.orders_tip['tip'] = self.orders_tip['tip'].astype(object)
-        self.orders_tip.loc[self.orders_tip['order_id'].isin(self.tip_test['order_id']), 'tip'] = np.nan
+
+class ReorderedRatio(StaticFeature):
+
+    def __init__(self, data_store):
+        super().__init__(data_store, 'reordered_ratio')
+
+    def _compute_feature(self):
+        reordered_rate = (self.orders_joined.groupby('order_id')['reordered'].mean().reset_index()
+                          .rename(columns={'reordered': self.feature}))
+        self.orders_tip = pd.merge(self.orders_tip, reordered_rate, on='order_id', how='left')
 
     def _analyze_feature(self):
         pass
