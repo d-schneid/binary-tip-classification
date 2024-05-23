@@ -48,5 +48,5 @@ class DataStore:
         return self.orders_joined_subset if columns is None else self.orders_joined_subset[columns]
 
     def set_data_subset(self, order_ids):
-        self.orders_tip_subset = self.orders_tip[self.orders_tip['order_id'].isin(order_ids)].copy()
-        self.orders_joined_subset = self.orders_joined[self.orders_joined['order_id'].isin(order_ids)].copy()
+        self.orders_tip_subset = self.orders_tip[self.orders_tip['order_id'].isin(order_ids)]
+        self.orders_joined_subset = self.orders_joined[self.orders_joined['order_id'].isin(order_ids)]
