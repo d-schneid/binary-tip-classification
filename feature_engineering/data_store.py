@@ -29,6 +29,7 @@ class DataStore:
 
     def merge_orders_tip(self, orders_tip, feature):
         self._orders_tip = pd.merge(self._orders_tip, orders_tip[[feature, 'order_id']], on='order_id', how='left')
+        self.merge_orders_tip_subset(orders_tip, feature)
 
     def merge_orders_tip_subset(self, orders_tip, feature):
         self._orders_tip_subset = pd.merge(self._orders_tip_subset, orders_tip[[feature, 'order_id']], on='order_id',
