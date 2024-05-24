@@ -6,3 +6,4 @@ from .order_size import OrderSize
 from .prev_tipped_products_ratio import PrevTippedProductsRatio
 from .reordered_ratio import ReorderedRatio
 from .tip_history import TipHistory
+from .tip_rate import ProductTipRate, DepartmentTipRate, AisleTipRate
