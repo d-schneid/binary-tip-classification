@@ -8,3 +8,4 @@ from .reordered_ratio import ReorderedRatio
 from .tip_history import TipHistory
 from .tip_rate import ProductTipRate, DepartmentTipRate, AisleTipRate
 from .order_frequency import OrderFrequency
+from .days_since_tip import DaysSinceTip
