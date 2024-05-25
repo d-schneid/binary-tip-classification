@@ -36,7 +36,7 @@ class DaysSinceTip(StaticFeature):
 		# difference between cumulative days of order and its reference point (cumulative days of last order with tip)
 		# is the number of days since the last order with a tip occurred
 		orders_tip_copy[self._feature] = np.where(orders_tip_copy['cum_days_last_tip'] != -1,
-												 orders_tip_copy['cum_days'] - orders_tip_copy['cum_days_last_tip'], -1)
+												 orders_tip_copy['cum_days'] - orders_tip_copy['cum_days_last_tip'], -1).astype(int)
 		return orders_tip_copy
 
 	def _analyze_feature(self):
