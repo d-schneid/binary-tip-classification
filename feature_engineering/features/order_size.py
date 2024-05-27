@@ -5,8 +5,8 @@ from feature_engineering import StaticFeature
 
 class OrderSize(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'order_size')
+    def __init__(self):
+        super().__init__('order_size')
 
     def _compute_feature(self):
         order_size = (self.orders_joined.groupby('order_id')['order_number'].size().reset_index()

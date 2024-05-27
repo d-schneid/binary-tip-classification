@@ -5,8 +5,8 @@ from feature_engineering.feature import StaticFeature
 
 class ReorderedRatio(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'reordered_ratio')
+    def __init__(self):
+        super().__init__('reordered_ratio')
 
     def _compute_feature(self):
         reordered_rate = (self.orders_joined.groupby('order_id')['reordered'].mean().reset_index()

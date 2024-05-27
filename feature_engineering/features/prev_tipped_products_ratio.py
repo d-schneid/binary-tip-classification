@@ -5,10 +5,10 @@ from feature_engineering import StaticFeature
 
 class PrevTippedProductsRatio(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'prev_tipped_products_ratio')
+    def __init__(self):
+        super().__init__('prev_tipped_products_ratio')
 
-    def prev_tipped_products_ratio_calculation(self, user_orders):
+    def _prev_tipped_products_ratio_calculation(self, user_orders):
         cumulative_products = set()
         for idx, order in user_orders.iterrows():
             prev_tipped_products = cumulative_products.intersection(order['products'])
@@ -21,7 +21,7 @@ class PrevTippedProductsRatio(StaticFeature):
         grouped = (self.orders_joined.groupby(['user_id', 'order_number', 'order_id']).agg(
             products=('product_id', lambda x: set(x)), tip=('tip', 'first'))).reset_index()
 
-        grouped = grouped.groupby('user_id').apply(self.prev_tipped_products_ratio_calculation,
+        grouped = grouped.groupby('user_id').apply(self._prev_tipped_products_ratio_calculation,
                                                    include_groups=False).reset_index(
             drop=False).drop(columns='level_1')
 

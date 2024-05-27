@@ -1,4 +1,4 @@
-#average #products in previous orders of the respective user compared to current order
+# average #products in previous orders of the respective user compared to current order
 import pandas as pd
 
 from feature_engineering.feature import StaticFeature

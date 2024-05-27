@@ -3,8 +3,8 @@ from feature_engineering import StaticFeature
 
 class TipHistory(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'tip_history')
+    def __init__(self):
+        super().__init__('tip_history')
 
     def _compute_feature(self):
         self.orders_tip[self.feature] = (self.orders_tip.assign(tip_bool=self.orders_tip['tip'].astype(bool))
