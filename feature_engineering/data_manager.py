@@ -33,14 +33,26 @@ class DataManager:
         orders_joined = pd.merge(orders_joined, self._aisles)
         return pd.merge(orders_joined, self._departments)
 
-    def get_orders_tip(self, full=False):
-        if full:
+    def get_orders_tip(self, complete=False):
+        if complete:
             return self._orders_tip
         else:
             return self._orders_tip_subset
 
-    def get_orders_joined(self):
-        return self._orders_joined_subset
+    def get_orders_joined(self, complete=False):
+        if complete:
+            return self._orders_joined
+        else:
+            return self._orders_joined_subset
+
+    def get_products(self):
+        return self._products
+
+    def get_aisles(self):
+        return self._aisles
+
+    def get_departments(self):
+        return self._departments
 
     def set_subset(self, order_ids):
         self._orders_tip_subset = self._orders_tip[self._orders_tip['order_id'].isin(order_ids)].copy()

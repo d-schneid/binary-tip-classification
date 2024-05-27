@@ -12,7 +12,6 @@ from .prev_tipped_products_ratio import PrevTippedProductsRatio
 from .reordered_ratio import ReorderedRatio
 from .sim_orders_tip_ratio import SimOrdersTipRatio
 from .tip_history import TipHistory
-from .sum_day_since_prior_orders import SumDaysSincePriorOrder
 from .avg_size_prev_orders import AvgSizePrevOrders
 from .tip_rate import ProductTipRate, DepartmentTipRate, AisleTipRate
-
+from .order_excess_likability import OrderExcessLikability

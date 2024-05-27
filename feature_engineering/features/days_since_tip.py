@@ -47,8 +47,8 @@ class DaysSinceTip(StaticFeature):
 
 class RelDaysSinceTip(DaysSinceTip):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'rel_days_since_tip')
+    def __init__(self):
+        super().__init__('rel_days_since_tip')
 
     def _compute_feature(self):
         orders_tip_copy = self._compute_days_since_tip()
