@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 
 from feature_engineering import StaticFeature
 
@@ -21,7 +22,7 @@ class LastTipSequence(StaticFeature):
         last_tip_sequence = 0
 
         for index, order in user_orders.iterrows():
-            user_orders.at[index, self.feature] = last_tip_sequence
+            user_orders.at[index, self.feature] = last_tip_sequence / math.log(order['order_number'])
             if order['tip'] == 1.0:
                 last_tip_sequence += 1
             else:

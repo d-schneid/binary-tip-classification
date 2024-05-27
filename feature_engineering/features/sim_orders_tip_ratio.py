@@ -37,6 +37,7 @@ class SimOrdersTipRatio(StaticFeature):
 
             user_orders.at[index, self.feature] = (
                     sum(comparison_results_tipped_orders) - sum(comparison_results_none_tipped_orders)
+                    / order['order_number']
             )
 
             if order['tip'] == 1.0:
