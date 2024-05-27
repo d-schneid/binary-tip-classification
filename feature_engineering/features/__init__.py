@@ -10,4 +10,6 @@ from .prev_order_tipped import PrevOrderTipped
 from .prev_tipped_products_ratio import PrevTippedProductsRatio
 from .reordered_ratio import ReorderedRatio
 from .tip_history import TipHistory
+from .sum_day_since_prior_orders import SumDaysSincePriorOrder
+from .avg_size_prev_orders import AvgSizePrevOrders
 from .tip_rate import ProductTipRate, DepartmentTipRate, AisleTipRate
