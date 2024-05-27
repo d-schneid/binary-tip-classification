@@ -23,7 +23,11 @@ class LastTipSequence(StaticFeature):
         last_tip_sequence = 0
 
         for index, order in user_orders.iterrows():
-            user_orders.at[index, self.feature] = last_tip_sequence / math.log(order['order_number'])
+            if order['order_number'] == 0:
+                user_orders.at[index, self.feature] = 0
+            else:
+                user_orders.at[index, self.feature] = last_tip_sequence / math.log(order['order_number'] + 1)
+
             if order['tip'] == 1.0:
                 last_tip_sequence += 1
             else:
