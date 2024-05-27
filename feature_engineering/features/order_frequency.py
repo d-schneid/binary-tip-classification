@@ -5,8 +5,8 @@ from feature_engineering import StaticFeature
 
 class OrderFrequency(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'order_frequency')
+    def __init__(self):
+        super().__init__('order_frequency')
 
     def _compute_feature(self):
         # temporarily set to NaN for accurate computation, since it is set to -1 by superclass beforehand

@@ -1,13 +1,14 @@
-import pandas as pd
 import math
+
+import pandas as pd
 
 from feature_engineering import StaticFeature
 
 
 class LastTipSequence(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'last_tip_sequence')
+    def __init__(self):
+        super().__init__('last_tip_sequence')
 
     def _compute_feature(self):
         calculated_tip_sequence = (self.orders_tip.groupby('user_id')

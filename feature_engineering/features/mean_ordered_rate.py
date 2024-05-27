@@ -5,8 +5,8 @@ from feature_engineering.feature import StaticFeature
 
 class MeanOrderedRate(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'mean_ordered_rate')
+    def __init__(self):
+        super().__init__('mean_ordered_rate')
 
     def _compute_feature(self):
         orders_joined_sorted = self.orders_joined.sort_values(by=['user_id', 'order_number'])

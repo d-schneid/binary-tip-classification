@@ -6,8 +6,8 @@ from feature_engineering.feature import StaticFeature
 
 class AvgSizePrevOrders(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'avg_size_prev_orders')
+    def __init__(self):
+        super().__init__('avg_size_prev_orders')
 
     def _compute_feature(self):
         order_size = (self.orders_joined.groupby('order_id')['order_number'].size().reset_index()

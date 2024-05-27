@@ -7,8 +7,8 @@ from feature_engineering import DynamicFeature
 
 class TipRate(DynamicFeature):
 
-    def __init__(self, data_store, name, id_name):
-        super().__init__(data_store, name)
+    def __init__(self, name, id_name):
+        super().__init__(name)
         self._id = id_name
 
     def _compute_feature(self):
@@ -31,8 +31,8 @@ class TipRate(DynamicFeature):
 
 class ProductTipRate(TipRate):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'product_tip_rate', 'product_id')
+    def __init__(self):
+        super().__init__('product_tip_rate', 'product_id')
 
     def _analyze_feature(self):
         pass
@@ -40,8 +40,8 @@ class ProductTipRate(TipRate):
 
 class DepartmentTipRate(TipRate):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'dept_tip_rate', 'department_id')
+    def __init__(self):
+        super().__init__('dept_tip_rate', 'department_id')
 
     def _analyze_feature(self):
         pass
@@ -49,8 +49,8 @@ class DepartmentTipRate(TipRate):
 
 class AisleTipRate(TipRate):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'aisle_tip_rate', 'aisle_id')
+    def __init__(self):
+        super().__init__('aisle_tip_rate', 'aisle_id')
 
     def _analyze_feature(self):
         pass

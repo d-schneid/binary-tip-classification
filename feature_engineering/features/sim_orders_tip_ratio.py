@@ -5,8 +5,8 @@ from feature_engineering import StaticFeature
 
 class SimOrdersTipRatio(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'sim_orders_tip_ratio')
+    def __init__(self):
+        super().__init__('sim_orders_tip_ratio')
 
     def _compute_feature(self):
         order_with_grouped_products = (self.orders_joined.groupby(['user_id', 'order_number', 'order_id']).agg(

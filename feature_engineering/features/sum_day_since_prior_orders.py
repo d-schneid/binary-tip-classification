@@ -5,8 +5,8 @@ from feature_engineering.feature import StaticFeature
 
 class SumDaysSincePriorOrder(StaticFeature):
 
-    def __init__(self, data_store):
-        super().__init__(data_store, 'sum_days_since_prior_order')
+    def __init__(self):
+        super().__init__('sum_days_since_prior_order')
 
     def _compute_feature(self):
         sum_days_since_prior_order = (

@@ -6,8 +6,8 @@ from feature_engineering import StaticFeature
 
 class DaysSinceTip(StaticFeature):
 
-    def __init__(self, data_store, name='days_since_tip'):
-        super().__init__(data_store, name)
+    def __init__(self, name='days_since_tip'):
+        super().__init__(name)
         self._feature = 'days_since_tip'
 
     def _compute_feature(self):
@@ -64,7 +64,7 @@ class RelDaysSinceTip(DaysSinceTip):
         # use only days between two orders where for both a tip was given
         orders_tip_copy['mean_days_tipped_orders'] = np.where(orders_tip_copy['num_tips'] > 1,
                                                               orders_tip_copy['cum_days_tipped_orders'] / (
-                                                                          orders_tip_copy['num_tips'] - 1),
+                                                                      orders_tip_copy['num_tips'] - 1),
                                                               -1)
 
         # shift to account for fact that for current order tip behavior is not known, since it shall be predicted
