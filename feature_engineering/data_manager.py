@@ -1,3 +1,6 @@
+import zipfile
+from pathlib import Path
+
 import pandas as pd
 
 from feature_engineering import StaticFeature, DynamicFeature
@@ -64,6 +67,7 @@ class DataManager:
             static_features = [feature.get_feature_name() for feature in self.static_features]
             if feature.get_feature_name() not in static_features:
                 self.static_features.add(feature)
+
         elif isinstance(feature, DynamicFeature):
             dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
             if feature.get_feature_name() not in dynamic_features:
@@ -114,3 +118,41 @@ class DataManager:
         self._orders_tip_subset = self._orders_tip_subset.drop(static_features, axis=1, errors='ignore')
         self._orders_tip_subset = pd.merge(self._orders_tip_subset, self._orders_tip[['order_id'] + static_features],
                                            on='order_id', how='left')
+
+    def export_features(self, path, only_static=False):
+        features = [feature.get_feature_name() for feature in self.static_features]
+        if not only_static:
+            features += [feature.get_feature_name() for feature in self.dynamic_features]
+            if not self._orders_tip_subset['order_id'].equals(self._orders_tip['order_id']):
+                raise ValueError('Dynamic features have not been computed for the complete dataset.')
+            else:
+                df_to_export = self._orders_tip_subset
+        else:
+            df_to_export = self._orders_tip
+
+        filepath = Path(path)
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+
+        with zipfile.ZipFile(filepath, mode='w', compression=zipfile.ZIP_DEFLATED) as archive:
+            csv_filename = filepath.stem + '.csv'
+            with archive.open(csv_filename, mode='w') as csv_file:
+                df_to_export.to_csv(csv_file, columns=['order_id'] + features, index=False)
+
+    def import_features(self, path, only_static=False):
+        filepath = Path(path)
+        orders_tip_imported = pd.read_csv(filepath)
+
+        static_features = [feature.get_feature_name() for feature in self.static_features]
+        columns_to_merge_static = [col for col in static_features if col in orders_tip_imported.columns] + ['order_id']
+        self._orders_tip = self._orders_tip.drop(static_features, axis=1, errors='ignore')
+        self._orders_tip = pd.merge(self._orders_tip, orders_tip_imported[columns_to_merge_static], on='order_id',
+                                    how='left')
+        self._merge_static_features_into_subset()
+
+        if not only_static:
+            dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
+            columns_to_merge_dynamic = [col for col in dynamic_features if col in orders_tip_imported.columns] + [
+                'order_id']
+            self._orders_tip_subset = self._orders_tip_subset.drop(dynamic_features, axis=1, errors='ignore')
+            self._orders_tip_subset = pd.merge(self._orders_tip_subset, orders_tip_imported[columns_to_merge_dynamic],
+                                               on='order_id', how='left')
