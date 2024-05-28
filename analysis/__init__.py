@@ -1,2 +1,2 @@
 from .analysis import Analysis
-from .example import ExampleAnalysis
+from .analysis_kilian import AnalysisKilian
