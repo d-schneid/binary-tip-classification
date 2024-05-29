@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from analysis import Analysis
 
 
-class AnalysisKilian(Analysis):
+class OrderTime(Analysis):
 
     def __init__(self, data_manager):
         super().__init__(data_manager)
