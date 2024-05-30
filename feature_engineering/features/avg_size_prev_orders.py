@@ -1,4 +1,5 @@
 # average #products in previous orders of the respective user compared to current order
+import numpy as np
 import pandas as pd
 
 from feature_engineering.feature import StaticFeature
@@ -10,27 +11,18 @@ class AvgSizePrevOrders(StaticFeature):
         super().__init__('avg_size_prev_orders')
 
     def _compute_feature(self):
-        order_size = (self.orders_joined.groupby('order_id')['order_number'].size().reset_index()
-                      .rename(columns={'order_number': 'order_size'}))
-        base = pd.merge(self.orders_joined, order_size, on='order_id', how='left')
-        avg_size_prev_orders = (
-            base.groupby('user_id')['order_size'].mean().reset_index()
-            .rename(columns={'order_size': self.feature}))
-        latest_order = base[base['order_number'] == base.groupby('user_id')['order_number'].transform('max')]
-        latest_order = latest_order[['order_id', 'user_id']]
-        # latest_order unique rows
-        latest_order = latest_order.drop_duplicates()
-        # compare average size of previous orders to current order
-        result = pd.merge(latest_order, avg_size_prev_orders, on='user_id', how='left')
-        result['avg_size_prev_orders'] = result['avg_size_prev_orders'].fillna(0)
-        result = pd.merge(result, base[['order_id', 'order_size']], on='order_id', how='left')
-        result['avg_size_prev_orders'] = result['avg_size_prev_orders'] / result['order_size']
-        result.drop(['order_size'], axis=1, inplace=True)
-        result.drop(['order_id'], axis=1, inplace=True)
-        result = result.drop_duplicates()
-        result = result.rename(columns={'avg_size_prev_orders': self.feature})
+        orders = self.orders_joined.copy()
+        orders = orders[['user_id', 'order_id', 'order_number']]
+        orders = orders.sort_values(['user_id', 'order_number'])
+        # Calculate the order size
+        orders['order_size'] = orders.groupby('order_id')['order_number'].transform('size')
+        orders = orders.drop_duplicates(subset=['user_id', 'order_number'], keep='last')
+        # Calculate the average order size of previous orders
+        orders['avg_prev'] = orders.groupby('user_id')['order_size'].cumsum() / orders['order_number']
+        orders['avg_prev'] = orders.groupby('user_id')['avg_prev'].shift(1).fillna(0).astype(np.float32)
+        orders[self.feature] = orders['avg_prev'] / orders['order_size']
 
-        self.orders_tip = pd.merge(self.orders_tip, result, on='user_id', how='left')
+        self.orders_tip = pd.merge(self.orders_tip, orders[['order_id', self.feature]], on='order_id', how='left')
 
     def _analyze_feature(self):
         pass
