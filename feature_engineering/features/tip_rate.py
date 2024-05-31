@@ -13,7 +13,6 @@ class TipRate(DynamicFeature):
 
     def _compute_feature(self):
         orders_joined_copy = self.orders_joined.copy()
-        orders_joined_all = self.orders_joined
 
         # drop all orders that have no tip (tip==None)
         orders_joined_copy = orders_joined_copy.dropna(subset=['tip'])

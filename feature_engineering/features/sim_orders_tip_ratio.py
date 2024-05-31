@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 from feature_engineering import StaticFeature
 
 
@@ -28,7 +28,7 @@ class SimOrdersTipRatio(StaticFeature):
             comparison_results_none_tipped_orders = []
 
             if order['order_number'] == 1:
-                user_orders.at[index, self.feature] = None
+                user_orders.at[index, self.feature] = np.nan
             else:
                 for order_products in cumulative_products_tipped_orders:
                     order_similarity = self._compare_orders_products_jaccard_similarity(order['products'], order_products)
