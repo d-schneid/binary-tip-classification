@@ -35,7 +35,8 @@ class OrderContents(Analysis):
         tip_data = cross_tab[1][:-1]
         ax1.bar(cross_tab.index[:-1], tip_data, color='green', label='Tip', alpha=0.5)
         ax1.bar(cross_tab.index[:-1], no_tip_data, color='red', label='No Tip', alpha=0.5)
-        ax1.set_xticklabels(ax1.get_xticks(), rotation=45, ha="right")
+        ax1.set_xticks(cross_tab.index[:-1])
+        ax1.set_xticklabels(cross_tab.index[:-1], rotation=45, ha="right")
         ax1.set_xlabel(feature)
         ax1.set_ylabel("Order Frequency")
         ax1.set_title(f"Frequency of Orders by {feature}")
@@ -46,7 +47,8 @@ class OrderContents(Analysis):
         ax2.bar(cross_tab_normalized.index[:-1], cross_tab_normalized[1][:-1],
                 label='Tip Probability')
         ax2.axhline(y=mean_probability, linestyle='--', label='Mean Tip Probability', color='red')
-        ax2.set_xticklabels(ax2.get_xticks(), rotation=45, ha="right")
+        ax2.set_xticks(cross_tab_normalized.index[:-1])
+        ax2.set_xticklabels(cross_tab_normalized.index[:-1], rotation=45, ha="right")
         ax2.set_xlabel(feature)
         ax2.set_ylabel("Tip Probability")
         ax2.set_title(f"Tip Probability by {feature}")
