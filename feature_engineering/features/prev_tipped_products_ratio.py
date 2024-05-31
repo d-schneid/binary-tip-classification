@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from feature_engineering import StaticFeature
@@ -26,6 +27,8 @@ class PrevTippedProductsRatio(StaticFeature):
             drop=False).drop(columns='level_1')
 
         self.orders_tip = pd.merge(self.orders_tip, grouped[['order_id', self.feature]], on='order_id', how='left')
+
+        self.orders_tip.loc[self.orders_tip['order_number'] == 1, self.feature] = np.nan
 
     def _analyze_feature(self):
         pass
