@@ -27,17 +27,20 @@ class SimOrdersTipRatio(StaticFeature):
             comparison_results_tipped_orders = []
             comparison_results_none_tipped_orders = []
 
-            for order_products in cumulative_products_tipped_orders:
-                order_similarity = self._compare_orders_products_jaccard_similarity(order['products'], order_products)
-                comparison_results_tipped_orders.append(order_similarity)
+            if order['order_number'] == 1:
+                user_orders.at[index, self.feature] = None
+            else:
+                for order_products in cumulative_products_tipped_orders:
+                    order_similarity = self._compare_orders_products_jaccard_similarity(order['products'], order_products)
+                    comparison_results_tipped_orders.append(order_similarity)
 
-            for order_products in cumulative_products_none_tipped_orders:
-                order_similarity = self._compare_orders_products_jaccard_similarity(order['products'], order_products)
-                comparison_results_none_tipped_orders.append(order_similarity)
+                for order_products in cumulative_products_none_tipped_orders:
+                    order_similarity = self._compare_orders_products_jaccard_similarity(order['products'], order_products)
+                    comparison_results_none_tipped_orders.append(order_similarity)
 
-            user_orders.at[index, self.feature] = (
-                (sum(comparison_results_tipped_orders) - sum(comparison_results_none_tipped_orders)) / order['order_number'] - 1
-            )
+                user_orders.at[index, self.feature] = (
+                    (sum(comparison_results_tipped_orders) - sum(comparison_results_none_tipped_orders)) / order['order_number'] - 1
+                )
 
             if order['tip'] == 1.0:
                 cumulative_products_tipped_orders.append(order['products'])
