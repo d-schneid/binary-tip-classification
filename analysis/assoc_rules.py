@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-from multiprocessing import Pool
 from mlxtend.frequent_patterns import fpgrowth, association_rules
 from mlxtend.preprocessing import TransactionEncoder
 import matplotlib.pyplot as plt
@@ -10,12 +9,11 @@ from analysis import Analysis
 
 class AssocRules(Analysis):
 
-	def __init__(self, data_manager, id_col='department_id', min_support=0.001, min_confidence=0.0, num_cpus=4):
+	def __init__(self, data_manager, id_col='department_id', min_support=0.001, min_confidence=0.0):
 		super().__init__(data_manager)
 		self._id_col = id_col
 		self._min_support = min_support
 		self._min_confidence = min_confidence
-		self._num_cpus = num_cpus
 		self._tip_indicator = -1
 		self._assoc_rules = None
 
@@ -27,18 +25,6 @@ class AssocRules(Analysis):
 				  apply(self._build_transaction).tolist())
 		te = TransactionEncoder()
 		transactions_df = pd.DataFrame(te.fit(transactions).transform(transactions), columns=te.columns_)
-
-		# transaction_ids = list(set().union(*transactions))
-		# # prepare for parallel processing
-		# num_transaction_splits = len(transactions) // self._num_cpus
-		# transaction_splits = [transactions[i:i + num_transaction_splits]
-		# 					  for i in range(0, len(transactions), num_transaction_splits)]
-		# # needed for calling Pool.map
-		# args = [(transactions, transaction_ids) for transactions in transaction_splits]
-		# with Pool(self._num_cpus) as pool:
-		# 	# build multiple transactions_df in parallel
-		# 	transactions_dfs = pool.map(self._build_transactions_df, args)
-		# transactions_df = pd.concat(transactions_dfs, ignore_index=True)
 
 		# frequent itemsets contain transactions ids
 		freq_itemsets = fpgrowth(transactions_df, min_support=self._min_support, use_colnames=True)
