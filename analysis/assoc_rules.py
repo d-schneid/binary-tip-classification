@@ -38,13 +38,6 @@ class AssocRules(Analysis):
 			transaction.append(self._tip_indicator)
 		return transaction
 
-	def _build_transactions_df(self, args):
-		transactions, transaction_ids = args
-		# binary dataframe needed as input to compute frequent itemsets for deriving association rules
-		transactions = [{transaction_id: True for transaction_id in transaction} for transaction in transactions]
-		# transaction_ids that are not contained in given transactions, but in overall transactions, are NaN
-		return pd.DataFrame(transactions, columns=transaction_ids).fillna(False)
-
 	def _show_results(self):
 		fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
