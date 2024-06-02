@@ -4,3 +4,4 @@ from .order_contents import OrderContents
 from .reordered_analysis import ReorderedAnalysis
 from .temporaray import Temporary
 from .assoc_rules import AssocRules
+from .tip_sequence import TipSequence
