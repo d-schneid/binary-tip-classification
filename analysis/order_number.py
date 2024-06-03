@@ -4,33 +4,25 @@ from matplotlib import pyplot as plt
 from analysis import Analysis
 
 
-class Temporary(Analysis):
+class OrderNumber(Analysis):
 
     def __init__(self, data_manager):
         super().__init__(data_manager)
-        self.cross_tab_dspo = None
-        self.cross_tab_dspo_normalized = None
-        self.cross_tab_on = None
-        self.cross_tab_on_normalized = None
+        self.cross_tab_order_number = None
+        self.cross_tab_order_number_normalized = None
 
     def _analyze(self):
-        dspo_on_tip = self.orders_tip[['order_number', 'days_since_prior_order', 'tip']]
+        order_number_tip = self.orders_tip[['order_number', 'tip']]
 
-        self.cross_tab_dspo = pd.crosstab(index=dspo_on_tip['days_since_prior_order'], columns=dspo_on_tip['tip'],
-                                          margins=True)
-        self.cross_tab_dspo_normalized = pd.crosstab(index=dspo_on_tip['days_since_prior_order'],
-                                                     columns=dspo_on_tip['tip'],
-                                                     margins=True,
-                                                     normalize='index')
-
-        self.cross_tab_on = pd.crosstab(index=dspo_on_tip['order_number'], columns=dspo_on_tip['tip'], margins=True)
-        self.cross_tab_on_normalized = pd.crosstab(index=dspo_on_tip['order_number'], columns=dspo_on_tip['tip'],
-                                                   margins=True,
-                                                   normalize='index')
+        self.cross_tab_order_number = pd.crosstab(index=order_number_tip['order_number'],
+                                                  columns=order_number_tip['tip'], margins=True)
+        self.cross_tab_order_number_normalized = pd.crosstab(index=order_number_tip['order_number'],
+                                                             columns=order_number_tip['tip'],
+                                                             margins=True,
+                                                             normalize='index')
 
     def _show_results(self):
-        self._plot_cross_tab(self.cross_tab_dspo, self.cross_tab_dspo_normalized, 'Days Since Prior Order')
-        self._plot_cross_tab(self.cross_tab_on, self.cross_tab_on_normalized, 'Order Number')
+        self._plot_cross_tab(self.cross_tab_order_number, self.cross_tab_order_number_normalized, 'Order Number')
 
     def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature):
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 6))  # 1 row, 2 columns
@@ -57,14 +49,9 @@ class Temporary(Analysis):
         ax2.legend()
 
         mean_probability = cross_tab_normalized[1]['All']
-        # midpoint = (cross_tab_normalized.index[:-1].astype(int).min() + cross_tab_normalized.index[:-1].astype(
-        #     int).max()) / 2
-
         ax3.bar(cross_tab_normalized.index[:-1].astype(int), cross_tab_normalized[1][:-1],
                 label='Tip Probability')
         ax3.axhline(y=mean_probability, linestyle='--', label='Mean Tip Probability', color='red')
-        # ax2.text(x=midpoint, y=mean_probability, s=f'Mean: {mean_probability:.2f}', color='red',
-        #          va='bottom', ha='right')
         ax3.set_xlabel(feature)
         ax3.set_ylabel("Tip Probability")
         ax3.set_title(f"Tip Probability by {feature}")
