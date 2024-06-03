@@ -6,3 +6,4 @@ from .days_since_prio_order import DaysSincePriorOrder
 from .assoc_rules import AssocRules
 from .tip_sequence import TipSequence
 from .order_number import OrderNumber
+from .aisle import Aisle
