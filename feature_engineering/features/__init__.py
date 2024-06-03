@@ -15,3 +15,7 @@ from .tip_history import TipHistory
 from .avg_size_prev_orders import AvgSizePrevOrders
 from .tip_rate import ProductTipRate, DepartmentTipRate, AisleTipRate
 from .order_excess_likability import OrderExcessLikability
+from .dow_high_tip_probability import DowHighTipProbability
+from .hod_high_tip_probability import HodHighTipProbability
+from .order_number_squared import OrderNumberSquared
+from .contains_alcohol import ContainsAlcohol
