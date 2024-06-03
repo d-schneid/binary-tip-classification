@@ -12,15 +12,15 @@ class Department(Analysis):
         self.cross_tab_department_normalized = None
 
     def _analyze(self):
-        prod_aisle_dep_tip = self.orders_joined[['product_id', 'aisle_id', 'department_id', 'tip']]
+        department_tip = self.orders_joined[['department_id', 'tip']]
         department_mapping = self.departments.set_index('department_id')['department']
 
-        self.cross_tab_department = pd.crosstab(index=prod_aisle_dep_tip['department_id'],
-                                                columns=prod_aisle_dep_tip['tip'],
+        self.cross_tab_department = pd.crosstab(index=department_tip['department_id'],
+                                                columns=department_tip['tip'],
                                                 margins=True).rename(index=department_mapping)
 
-        self.cross_tab_department_normalized = (pd.crosstab(index=prod_aisle_dep_tip['department_id'],
-                                                            columns=prod_aisle_dep_tip['tip'],
+        self.cross_tab_department_normalized = (pd.crosstab(index=department_tip['department_id'],
+                                                            columns=department_tip['tip'],
                                                             margins=True,
                                                             normalize='index')
                                                 .rename(index=department_mapping)
@@ -63,3 +63,5 @@ class Department(Analysis):
         # Show the plot
         plt.tight_layout()
         plt.show()
+
+        # self._save_plot(fig, 'department.png')

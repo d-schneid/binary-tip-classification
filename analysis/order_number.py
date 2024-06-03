@@ -25,7 +25,7 @@ class OrderNumber(Analysis):
         self._plot_cross_tab(self.cross_tab_order_number, self.cross_tab_order_number_normalized, 'Order Number')
 
     def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature):
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(20, 6))  # 1 row, 2 columns
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))  # 1 row, 2 columns
 
         # Subplot for Frequency
         no_tip_data = cross_tab[0][:-1]
@@ -48,15 +48,8 @@ class OrderNumber(Analysis):
         ax2.set_title(f"Tip Probability by {feature}")
         ax2.legend()
 
-        mean_probability = cross_tab_normalized[1]['All']
-        ax3.bar(cross_tab_normalized.index[:-1].astype(int), cross_tab_normalized[1][:-1],
-                label='Tip Probability')
-        ax3.axhline(y=mean_probability, linestyle='--', label='Mean Tip Probability', color='red')
-        ax3.set_xlabel(feature)
-        ax3.set_ylabel("Tip Probability")
-        ax3.set_title(f"Tip Probability by {feature}")
-        ax3.legend()
-
         # Show the plot
         plt.tight_layout()
         plt.show()
+
+        # self._save_plot(fig, 'order_number.png')
