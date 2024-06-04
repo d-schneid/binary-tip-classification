@@ -25,7 +25,7 @@ class DaysSincePriorOrder(Analysis):
         self._plot_cross_tab(self.cross_tab_dspo, self.cross_tab_dspo_normalized, 'Days Since Prior Order')
 
     def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature):
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))  # 1 row, 2 columns
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
         # Subplot for Frequency
         no_tip_data = cross_tab[0][:-1]
