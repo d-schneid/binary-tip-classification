@@ -21,10 +21,10 @@ class DayOfWeek(Analysis):
                                                     margins=True,
                                                     normalize='index')
 
-    def _show_results(self):
-        self._plot_cross_tab(self.cross_tab_dow, self.cross_tab_dow_normalized, 'Day of Week')
+    def _show_results(self, save_plots=False):
+        self._plot_cross_tab(self.cross_tab_dow, self.cross_tab_dow_normalized, 'Day of Week', save_plots=save_plots)
 
-    def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature):
+    def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature, save_plots=False):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))  # 1 row, 2 columns
 
         # Subplot for Frequency
@@ -52,4 +52,5 @@ class DayOfWeek(Analysis):
         plt.tight_layout()
         plt.show()
 
-        # self._save_plot(fig, f'order_time_{feature.lower().replace(" ", "_")}.png')
+        if save_plots:
+            self._save_plot(fig, 'day_of_week.png')

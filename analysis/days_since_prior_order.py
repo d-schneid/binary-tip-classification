@@ -21,10 +21,11 @@ class DaysSincePriorOrder(Analysis):
                                                      margins=True,
                                                      normalize='index')
 
-    def _show_results(self):
-        self._plot_cross_tab(self.cross_tab_dspo, self.cross_tab_dspo_normalized, 'Days Since Prior Order')
+    def _show_results(self, save_plots=False):
+        self._plot_cross_tab(self.cross_tab_dspo, self.cross_tab_dspo_normalized, 'Days Since Prior Order',
+                             save_plots=save_plots)
 
-    def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature):
+    def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature, save_plots=False):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
         # Subplot for Frequency
@@ -52,4 +53,5 @@ class DaysSincePriorOrder(Analysis):
         plt.tight_layout()
         plt.show()
 
-        # self._save_plot(fig, 'days_since_prior_order.png')
+        if save_plots:
+            self._save_plot(fig, 'days_since_prior_order.png')

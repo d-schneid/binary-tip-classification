@@ -46,17 +46,17 @@ class Product(Analysis):
                                                  left_index=True,
                                                  right_on='product_id')
 
-    def _show_results(self):
-        self._plot_distribution(self.product_probability_freq, weighted=False)
-        self._plot_distribution(self.product_probability_freq, weighted=True)
+    def _show_results(self, save_plots=False):
+        self._plot_distribution(self.product_probability_freq, weighted=False, save_plots=save_plots)
+        self._plot_distribution(self.product_probability_freq, weighted=True, save_plots=save_plots)
         self._print_general_facts()
-        self._plot_partial_distribution(self.product_probability_freq, 0.8, 1.0, 20)
+        self._plot_partial_distribution(self.product_probability_freq, 0.8, 1.0, 20, save_plots=save_plots)
         self._print_upper_bound_statistics()
-        self._plot_partial_distribution(self.product_probability_freq, 0.0, 0.2, 20)
+        self._plot_partial_distribution(self.product_probability_freq, 0.0, 0.2, 20, save_plots=save_plots)
         self._print_lower_bound_statistics()
-        self._plot_no_tip_distribution(self.product_probability_freq)
+        self._plot_no_tip_distribution(self.product_probability_freq, save_plots=save_plots)
 
-    def _plot_distribution(self, product_probability_freq, weighted):
+    def _plot_distribution(self, product_probability_freq, weighted, save_plots=False):
         fig, ax = plt.subplots(1, 1, figsize=(20, 6))
 
         alcohol_products = product_probability_freq[product_probability_freq['department_id'] == 5]
@@ -71,6 +71,7 @@ class Product(Analysis):
                     color=['C1', 'C0'])
             ax.set_title('Distribution of Tip Rates by Product (Weighted by Order Frequency)')
             ax.set_ylabel('Product Order Frequency')
+            file = 'product_distribution_weighted.png'
         else:
             ax.hist([alcohol_products[1], non_alcohol_products[1]],
                     bins=100,
@@ -79,6 +80,7 @@ class Product(Analysis):
                     color=['C1', 'C0'])
             ax.set_title('Distribution of Tip Rates by Product')
             ax.set_ylabel('Product Frequency')
+            file = 'product_distribution.png'
 
         ax.set_xlabel('Tip Rate')
         ax.axvline(self.mean_tip_probability,
@@ -94,7 +96,10 @@ class Product(Analysis):
         plt.tight_layout()
         plt.show()
 
-    def _plot_partial_distribution(self, product_probability_freq, lower_bound, upper_bound, bins):
+        if save_plots:
+            self._save_plot(fig, file)
+
+    def _plot_partial_distribution(self, product_probability_freq, lower_bound, upper_bound, bins, save_plots=False):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
         range_mask = (product_probability_freq[1] >= lower_bound) & (product_probability_freq[1] <= upper_bound)
@@ -134,7 +139,10 @@ class Product(Analysis):
         plt.tight_layout()
         plt.show()
 
-    def _plot_no_tip_distribution(self, product_probability_freq):
+        if save_plots:
+            self._save_plot(fig, f'product_distribution_{lower_bound}_{upper_bound}.png')
+
+    def _plot_no_tip_distribution(self, product_probability_freq, save_plots=False):
         fig, ax = plt.subplots(1, 1, figsize=(20, 6))
 
         no_tip_products = product_probability_freq[product_probability_freq[1] == 0.0][['All', 'product_id']].groupby(
@@ -150,6 +158,9 @@ class Product(Analysis):
         ax.legend()
         plt.tight_layout()
         plt.show()
+
+        if save_plots:
+            self._save_plot(fig, 'product_distribution_no_tip.png')
 
     def _print_general_facts(self):
         print(f"Mean Order Frequency: {self.mean_order_frequency:.2f}")

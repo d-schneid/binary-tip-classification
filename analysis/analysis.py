@@ -11,15 +11,19 @@ class Analysis(ABC):
         self.products = data_manager.get_products()
         self.departments = data_manager.get_departments()
         self.aisles = data_manager.get_aisles()
+        self.save_path = 'data/plots/'
 
-    def execute_analysis(self):
+    def execute_analysis(self, save_plots=False):
         self._analyze()
-        self._show_results()
+        self._show_results(save_plots)
+
+    def _save_plot(self, fig, file):
+        fig.savefig(self.save_path + file, dpi=1000)
 
     @abstractmethod
     def _analyze(self):
         pass
 
     @abstractmethod
-    def _show_results(self):
+    def _show_results(self, save_plots=False):
         pass

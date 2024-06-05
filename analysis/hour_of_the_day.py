@@ -21,11 +21,11 @@ class HourOfDay(Analysis):
                                                     margins=True,
                                                     normalize='index')
 
-    def _show_results(self):
-        self._plot_cross_tab(self.cross_tab_hod, self.cross_tab_hod_normalized, 'Hour of Day')
+    def _show_results(self, save_plots=False):
+        self._plot_cross_tab(self.cross_tab_hod, self.cross_tab_hod_normalized, 'Hour of Day', save_plots=save_plots)
 
-    def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature):
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))  # 1 row, 2 columns
+    def _plot_cross_tab(self, cross_tab, cross_tab_normalized, feature, save_plots=False):
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
         # Subplot for Frequency
         no_tip_data = cross_tab[0][:-1]
@@ -52,4 +52,5 @@ class HourOfDay(Analysis):
         plt.tight_layout()
         plt.show()
 
-        # self._save_plot(fig, f'order_time_{feature.lower().replace(" ", "_")}.png')
+        if save_plots:
+            self._save_plot(fig, 'hour_of_day.png')
