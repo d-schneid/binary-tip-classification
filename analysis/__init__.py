@@ -9,3 +9,4 @@ from .tip_sequence import TipSequence
 from .order_number import OrderNumber
 from .aisle import Aisle
 from .product import Product
+from .num_order_user import NumberOrderUser

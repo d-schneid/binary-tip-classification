@@ -20,7 +20,8 @@ class AvgSizePrevOrders(StaticFeature):
         # Calculate the average order size of previous orders
         orders['avg_prev'] = orders.groupby('user_id')['order_size'].cumsum() / orders['order_number']
         orders['avg_prev'] = orders.groupby('user_id')['avg_prev'].shift(1).fillna(0).astype(np.float32)
-        orders[self.feature] = orders['avg_prev'] / orders['order_size']
+        orders[self.feature] = (orders['order_size'] - orders['avg_prev']) / orders['avg_prev']
+        orders[self.feature] = orders[self.feature].replace([np.inf, -np.inf], np.nan)
 
         self.orders_tip = pd.merge(self.orders_tip, orders[['order_id', self.feature]], on='order_id', how='left')
 
