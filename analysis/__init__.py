@@ -10,3 +10,4 @@ from .order_number import OrderNumber
 from .aisle import Aisle
 from .product import Product
 from .num_order_user import NumberOrderUser
+from .product_card_order import ProductCardOrder
