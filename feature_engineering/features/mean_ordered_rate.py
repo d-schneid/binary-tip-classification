@@ -16,8 +16,6 @@ class MeanOrderedRate(StaticFeature):
                 orders_joined_sorted['order_number'] - 1)
         mean_ordered_rate = orders_joined_sorted.groupby('order_id')['ordered_rate'].mean().reset_index()
         mean_ordered_rate = mean_ordered_rate.rename(columns={'ordered_rate': self.feature})
-        # first order of a user
-        mean_ordered_rate[self.feature] = mean_ordered_rate[self.feature].fillna(-1)
         self.orders_tip = pd.merge(self.orders_tip, mean_ordered_rate, on='order_id', how='left')
 
     def _analyze_feature(self):
