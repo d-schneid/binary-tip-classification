@@ -4,7 +4,6 @@ from .dynamic_feature_test_1 import DynamicFeatureTest1
 from .dynamic_feature_test_2 import DynamicFeatureTest2
 from .last_tip_seq import LastTipSequence
 from .mean_ordered_rate import MeanOrderedRate
-from .mode_department import ModeDepartment
 from .order_frequency import OrderFrequency
 from .order_size import OrderSize
 from .prev_order_tipped import PrevOrderTipped
