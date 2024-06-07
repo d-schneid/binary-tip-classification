@@ -38,7 +38,7 @@ class AssocRules(Analysis):
 			transaction.append(self._tip_indicator)
 		return transaction
 
-	def _show_results(self):
+	def _show_results(self, save_plots=False):
 		fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
 		ax1.scatter(self._assoc_rules['support'], self._assoc_rules['confidence'])
@@ -55,3 +55,6 @@ class AssocRules(Analysis):
 
 		plt.tight_layout()
 		plt.show()
+
+		if save_plots:
+			self._save_plot(fig, 'assoc_rules.png')

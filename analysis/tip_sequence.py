@@ -61,7 +61,7 @@ class TipSequence(Analysis):
 		tip_streaks = [sum(1 for _ in group) for key, group in groupby(user_df['tip']) if key == 1]
 		return np.var(tip_streaks) if tip_streaks else -1
 
-	def _show_results(self):
+	def _show_results(self, save_plots=False):
 		fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(20, 6))
 
 		ax1.scatter(self._user_mean_tip_streaks['num_orders'], self._user_mean_tip_streaks['mean_tip_streak'])
@@ -86,3 +86,6 @@ class TipSequence(Analysis):
 
 		plt.tight_layout()
 		plt.show()
+
+		if save_plots:
+			self._save_plot(fig, 'tip_sequence.png')

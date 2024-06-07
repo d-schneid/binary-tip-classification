@@ -1,5 +1,4 @@
 from abc import abstractmethod
-
 import pandas as pd
 
 from feature_engineering import DynamicFeature
