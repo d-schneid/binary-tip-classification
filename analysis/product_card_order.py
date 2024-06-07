@@ -56,7 +56,7 @@ class ProductCardOrder(Analysis):
         self.product_tip_standard_deviation.columns = ['product_id', 'product_tip_bin_variance']
 
     def _show_results(self, save_plots=False):
-        self._plot_cross_tab(self.product_card_order_tip_rate, self.product_tip_standard_deviation)
+        self._plot_cross_tab(self.product_card_order_tip_rate, self.product_tip_standard_deviation, save_plots)
         self._plot_first_bin_tip_rate(self.product_card_normalized)
 
     def _calculate_variance(self, product_bins):
@@ -67,19 +67,7 @@ class ProductCardOrder(Analysis):
 
         return math.sqrt(sum_of_distance_to_mean / len(product_bins))
 
-    def _plot_standrad_deviation(self, product_bins):
-        fig, ax1 = plt.subplots(1, 1, figsize=(20, 6))
-
-        ax1.hist(product_bins['product_tip_bin_variance'], bins=20, color='C0', edgecolor='black', alpha=0.7)
-        ax1.set_xlabel('Products')
-        ax1.set_ylabel('standard deviation')
-        ax1.set_title('Distribution of standard deviation')
-
-        # Show the plot
-        plt.tight_layout()
-        plt.show()
-
-    def _plot_cross_tab(self, product_card_order_tip_rate, product_tip_standard_deviation):
+    def _plot_cross_tab(self, product_card_order_tip_rate, product_tip_standard_deviation, save_plots=False):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
         # Figure 1 Boxplot
@@ -98,6 +86,9 @@ class ProductCardOrder(Analysis):
         # Show the plot
         plt.tight_layout()
         plt.show()
+
+        if save_plots:
+            self._save_plot(fig, 'product_card_order.png')
 
     def _plot_first_bin_tip_rate(self, cross_tab_normalized):
         fig, ax = plt.subplots(1, 1, figsize=(20, 6))
