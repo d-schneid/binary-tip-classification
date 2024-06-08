@@ -4,10 +4,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 class LastOrderUserTSCVSplitter(BaseEstimator, TransformerMixin):
 
     def __init__(self, data_manager, n_splits):
+        self.data_manager = data_manager
         self.n_splits = n_splits
-        self.validation_sets = self._assign_cv_validation_set(data_manager)
+        self.validation_sets = self._assign_cv_validation_set()
 
-    def _assign_cv_validation_set(self, data_manager):
+    def _assign_cv_validation_set(self):
         """
         Assigns each point of the given user time-series to its respective validation set for cross-validation.
         The inverse column 'order_number' is assigned as validation set for cross-validation.
@@ -16,7 +17,7 @@ class LastOrderUserTSCVSplitter(BaseEstimator, TransformerMixin):
         :return: The user time-series along with a label 'cv_validation_set' indicating to which validation set
                  the respective point belongs to for cross-validation.
         """
-        validation_sets = data_manager.get_orders_tip()[['user_id', 'order_number']].copy()
+        validation_sets = self.data_manager.get_orders_tip_train()[['user_id', 'order_number']].copy()
         validation_sets['cv_validation_set'] = (validation_sets
                                                 .groupby('user_id')
                                                 .rank(method='first', ascending=False))

@@ -42,6 +42,22 @@ class DataManager:
         else:
             return self._orders_tip_subset
 
+    def get_orders_tip_train(self, complete=False):
+        if complete:
+            return self._orders_tip[self._orders_tip['tip'].notnull()].reset_index(
+                drop=True)
+        else:
+            return self._orders_tip_subset[self._orders_tip_subset['tip'].notnull()].reset_index(
+                drop=True)
+
+    def get_orders_tip_test(self, complete=False):
+        if complete:
+            return self._orders_tip[self._orders_tip['tip'].isnull()].reset_index(
+                drop=True)
+        else:
+            return self._orders_tip_subset[self._orders_tip_subset['tip'].isnull()].reset_index(
+                drop=True)
+
     def get_orders_joined(self, complete=False):
         if complete:
             return self._orders_joined
@@ -58,8 +74,10 @@ class DataManager:
         return self._departments
 
     def set_subset(self, order_ids):
-        self._orders_tip_subset = self._orders_tip[self._orders_tip['order_id'].isin(order_ids)].copy()
-        self._orders_joined_subset = self._orders_joined[self._orders_joined['order_id'].isin(order_ids)].copy()
+        self._orders_tip_subset = self._orders_tip[self._orders_tip['order_id'].isin(order_ids)].copy().reset_index(
+            drop=True)
+        self._orders_joined_subset = self._orders_joined[
+            self._orders_joined['order_id'].isin(order_ids)].copy().reset_index(drop=True)
         self._compute_dynamic_features()
 
     def register_feature(self, feature):
@@ -78,6 +96,15 @@ class DataManager:
             self.static_features.remove(feature)
         elif feature is DynamicFeature:
             self.dynamic_features.remove(feature)
+
+    def get_registered_features(self):
+        return [feature.get_feature_name() for feature in self.static_features.union(self.dynamic_features)]
+
+    def get_registered_static_features(self):
+        return [feature.get_feature_name() for feature in self.static_features]
+
+    def get_registered_dynamic_features(self):
+        return [feature.get_feature_name() for feature in self.dynamic_features]
 
     def compute_features(self, only_static=False):
         self._compute_static_features()
