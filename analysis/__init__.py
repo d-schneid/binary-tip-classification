@@ -11,4 +11,5 @@ from .aisle import Aisle
 from .product import Product
 from .num_order_user import NumberOrderUser
 from .product_card_order import ProductCardOrder
-from. general_facts import GeneralFacts
+from .general_analysis import GeneralAnalysis
+# from .general_facts import GeneralFacts

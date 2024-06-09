@@ -25,9 +25,6 @@ class Product(Analysis):
                                         columns=product_department_tip['tip'],
                                         margins=True)
 
-        self.mean_order_frequency = cross_tab_product['All'].mean()
-        self.median_order_frequency = cross_tab_product['All'].median()
-
         cross_tab_product_normalized = pd.crosstab(index=product_department_tip['product_id'],
                                                    columns=product_department_tip['tip'],
                                                    margins=True,
@@ -37,6 +34,9 @@ class Product(Analysis):
 
         cross_tab_product_normalized = cross_tab_product_normalized.drop('All', axis=0)
         cross_tab_product = cross_tab_product.drop('All', axis=0)
+        
+        self.mean_order_frequency = cross_tab_product['All'].mean()
+        self.median_order_frequency = cross_tab_product['All'].median()
 
         self.product_probability_freq = pd.merge(cross_tab_product_normalized, cross_tab_product['All'],
                                                  left_index=True,
