@@ -1,11 +1,12 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 
+from data_management.cross_validation import CustomTSCVSplitter
 
-class LastOrderUserTSCVSplitter(BaseEstimator, TransformerMixin):
+
+class LastOrderUserTSCVSplitter(BaseEstimator, TransformerMixin, CustomTSCVSplitter):
 
     def __init__(self, data_manager, n_splits):
-        self.data_manager = data_manager
-        self.n_splits = n_splits
+        super().__init__(data_manager, n_splits, 'last_order_user')
         self.validation_sets = self._assign_cv_validation_set()
 
     def _assign_cv_validation_set(self):
@@ -29,7 +30,7 @@ class LastOrderUserTSCVSplitter(BaseEstimator, TransformerMixin):
             train = X.index[(self.validation_sets['cv_validation_set'] > i)].tolist()
             test = X.index[self.validation_sets['cv_validation_set'] == i].tolist()
 
-            print(f'Iteration {i}: Train size: {len(train)}, Test size: {len(test)}')
+            # print(f'Iteration {i}: Train size: {len(train)}, Test size: {len(test)}')
             yield train, test
 
     def get_n_splits(self, X, y, groups=None):

@@ -44,19 +44,15 @@ class DataManager:
 
     def get_orders_tip_train(self, complete=False):
         if complete:
-            return self._orders_tip[self._orders_tip['tip'].notnull()].reset_index(
-                drop=True)
+            return self._orders_tip[self._orders_tip['tip'].notnull()].reset_index(drop=True)
         else:
-            return self._orders_tip_subset[self._orders_tip_subset['tip'].notnull()].reset_index(
-                drop=True)
+            return self._orders_tip_subset[self._orders_tip_subset['tip'].notnull()].reset_index(drop=True)
 
     def get_orders_tip_test(self, complete=False):
         if complete:
-            return self._orders_tip[self._orders_tip['tip'].isnull()].reset_index(
-                drop=True)
+            return self._orders_tip[self._orders_tip['tip'].isnull()]
         else:
-            return self._orders_tip_subset[self._orders_tip_subset['tip'].isnull()].reset_index(
-                drop=True)
+            return self._orders_tip_subset[self._orders_tip_subset['tip'].isnull()]
 
     def get_orders_joined(self, complete=False):
         if complete:
@@ -73,12 +69,15 @@ class DataManager:
     def get_departments(self):
         return self._departments
 
-    def set_subset(self, order_ids):
-        self._orders_tip_subset = self._orders_tip[self._orders_tip['order_id'].isin(order_ids)].copy().reset_index(
-            drop=True)
-        self._orders_joined_subset = self._orders_joined[
-            self._orders_joined['order_id'].isin(order_ids)].copy().reset_index(drop=True)
+    def set_subset(self, order_ids, reset_index=True):
+        order_ids = order_ids.sort_index()
+        self._orders_tip_subset = pd.merge(self._orders_tip, order_ids, how='inner').set_index(order_ids.index)
+        self._orders_joined_subset = pd.merge(self._orders_joined, order_ids, how='inner')
         self._compute_dynamic_features()
+
+        if reset_index:
+            self._orders_tip_subset = self._orders_tip_subset.reset_index(drop=True)
+            self._orders_joined_subset = self._orders_joined_subset.reset_index(drop=True)
 
     def register_feature(self, feature):
         if isinstance(feature, StaticFeature):
@@ -113,6 +112,9 @@ class DataManager:
             self._compute_dynamic_features()
 
     def _compute_static_features(self):
+        original_index = self._orders_tip_subset.index
+        original_index_joined = self._orders_joined_subset.index
+
         for feature in self.static_features:
             feature.set_orders_tip(self._orders_tip)
             feature.set_orders_joined(self._orders_joined)
@@ -126,7 +128,14 @@ class DataManager:
             self._orders_tip = feature.get_orders_tip()
             self._orders_joined = feature.get_orders_joined()
 
+        self._orders_tip.index = original_index
+        self._orders_joined.index = original_index_joined
+
     def _compute_dynamic_features(self):
+
+        original_index = self._orders_tip_subset.index
+        original_index_joined = self._orders_joined_subset.index
+
         for feature in self.dynamic_features:
             feature.set_orders_tip(self._orders_tip_subset)
             feature.set_orders_joined(self._orders_joined_subset)
@@ -139,6 +148,9 @@ class DataManager:
 
             self._orders_tip_subset = feature.get_orders_tip()
             self._orders_joined_subset = feature.get_orders_joined()
+
+        self._orders_tip_subset.index = original_index
+        self._orders_joined_subset.index = original_index_joined
 
     def _merge_static_features_into_subset(self):
         static_features = [feature.get_feature_name() for feature in self.static_features]
