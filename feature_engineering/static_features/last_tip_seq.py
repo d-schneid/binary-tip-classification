@@ -27,7 +27,7 @@ class LastTipSequence(StaticFeature):
             if order['order_number'] == 0:
                 user_orders.at[index, self.feature] = np.nan
             else:
-                user_orders.at[index, self.feature] = last_tip_sequence / math.log(order['order_number'] + 1) # evtl. Gewichtung rausnehmen
+                user_orders.at[index, self.feature] = last_tip_sequence
 
             if order['tip'] == 1.0:
                 last_tip_sequence += 1
