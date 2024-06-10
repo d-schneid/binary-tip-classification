@@ -1,7 +1,8 @@
 import zipfile
 from pathlib import Path
-
+import seaborn as sns
 import pandas as pd
+from matplotlib import pyplot as plt
 
 from feature_engineering import StaticFeature, DynamicFeature
 
@@ -195,3 +196,29 @@ class DataManager:
             self._orders_tip_subset = self._orders_tip_subset.drop(dynamic_features, axis=1, errors='ignore')
             self._orders_tip_subset = pd.merge(self._orders_tip_subset, orders_tip_imported[columns_to_merge_dynamic],
                                                on='order_id', how='left')
+
+    def analyze_features(self, only_static=False):
+        static_features = [feature.get_feature_name() for feature in self.static_features]
+        # static_features = ['reordered_ratio', 'sim_orders_tip_ratio', 'tip_history', 'contains_alcohol']
+        orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
+        tip = orders_tip_features['tip']
+
+        print(f'Analyze of static features:')
+
+        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+
+        for i, feature in enumerate(static_features):
+            position = i % 2
+            feature_data = orders_tip_features[feature]
+            feature_tip_correlation = feature_data.corr(tip)
+
+            sns.violinplot(data=orders_tip_features, x='tip', y=feature, ax=axs[position])
+            axs[position].set_title(f'{feature} vs tip correlation: {feature_tip_correlation}')
+            axs[position].set_xlabel('tip')
+            axs[position].set_ylabel(feature)
+
+            if position == 1:
+                plt.tight_layout()
+                plt.show()
+                if i != len(static_features) - 1:
+                    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
