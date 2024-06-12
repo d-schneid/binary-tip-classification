@@ -231,6 +231,8 @@ class DataManager:
 
     def calculate_feature_correlations(self, only_static=False):
         static_features = [feature.get_feature_name() for feature in self.static_features]
+        static_features.append('order_number')
+        static_features.append('days_since_prior_order')
 
         if not only_static:
             dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
@@ -249,8 +251,31 @@ class DataManager:
         correlation_df = correlation_df.sort_values(by='Correlation', ascending=False).reset_index(drop=True)
         print(correlation_df)
 
+    def visualize_correlation_between_features(self, only_static=False):
+        static_features = [feature.get_feature_name() for feature in self.static_features]
+        static_features.append('order_number')
+        static_features.append('days_since_prior_order')
+
+        if not only_static:
+            dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
+            orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
+            all_features = static_features + dynamic_features
+        else:
+            orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
+            all_features = static_features
+
+        # print(all_features)
+
+        filtered_data = orders_tip_features[all_features]
+        print(filtered_data.corr())
+        # scatter_matrix = pd.plotting.scatter_matrix(filtered_data, figsize=(12, 12), diagonal='kde')
+
+        # plt.show()
+
     def visualize_feature_analysis(self, only_static=False):
         static_features = [feature.get_feature_name() for feature in self.static_features]
+        static_features.append('order_number')
+        static_features.append('days_since_prior_order')
         dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
         orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
 
