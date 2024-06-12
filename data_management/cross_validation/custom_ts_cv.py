@@ -25,9 +25,10 @@ class CustomTSCVSplitter(ABC):
         all_orders_tip_train = self.data_manager.get_orders_tip_train().copy()
 
         for i, (train, test) in enumerate(self.split(all_orders_tip_train)):
+            order_ids_test = all_orders_tip_train.loc[test]['order_id']
             order_ids = all_orders_tip_train.loc[test + train]['order_id']
-
-            self.data_manager.set_subset(order_ids, reset_index=False, add_remove_first_orders=True)
+            self.data_manager.set_subset(order_ids, reset_index=False, add_remove_first_orders=True,
+                                         set_tips_to_nan=order_ids_test)
             orders_tip_train = self.data_manager.get_orders_tip()
 
             train_filename = dir / f'{self.splitter}_train_{i + 1}.csv.zip'

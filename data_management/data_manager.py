@@ -1,7 +1,9 @@
 import zipfile
 from pathlib import Path
-import seaborn as sns
+
+import numpy as np
 import pandas as pd
+import seaborn as sns
 from matplotlib import pyplot as plt
 
 from feature_engineering import StaticFeature, DynamicFeature
@@ -52,9 +54,9 @@ class DataManager:
     # TODO: Adjust to retrieve the correct test set
     def get_orders_tip_test(self, complete=False):
         if complete:
-            return self._orders_tip[self._orders_tip['tip'].isnull()]
+            return self._orders_tip[self._orders_tip['eval_set'] == 'train']
         else:
-            return self._orders_tip_subset[self._orders_tip_subset['tip'].isnull()]
+            return self._orders_tip_subset[self._orders_tip_subset['eval_set'] == 'train']
 
     def get_orders_joined(self, complete=False):
         if complete:
@@ -71,7 +73,7 @@ class DataManager:
     def get_departments(self):
         return self._departments
 
-    def set_subset(self, order_ids, reset_index=True, add_remove_first_orders=False):
+    def set_subset(self, order_ids, reset_index=True, add_remove_first_orders=False, set_tips_to_nan=None):
         indices = order_ids.sort_index().index
         if add_remove_first_orders:
             first_order_ids = self._orders_tip[self._orders_tip['order_number'] == 1]['order_id']
@@ -80,6 +82,10 @@ class DataManager:
         order_ids = order_ids.sort_index()
         self._orders_tip_subset = pd.merge(self._orders_tip, order_ids, how='inner')
         self._orders_joined_subset = pd.merge(self._orders_joined, order_ids, how='inner')
+
+        if set_tips_to_nan is not None:
+            self.set_tip_to_nan(set_tips_to_nan)
+
         self._compute_dynamic_features()
 
         if add_remove_first_orders:
@@ -101,6 +107,10 @@ class DataManager:
     def _remove_first_orders(self):
         self._orders_tip_subset = self._orders_tip_subset[self._orders_tip_subset['order_number'] > 1]
         self._orders_joined_subset = self._orders_joined_subset[self._orders_joined_subset['order_number'] > 1]
+
+    def set_tip_to_nan(self, order_ids):
+        self._orders_tip_subset.loc[self._orders_tip_subset['order_id'].isin(order_ids), 'tip'] = np.nan
+        self._orders_joined_subset.loc[self._orders_joined_subset['order_id'].isin(order_ids), 'tip'] = np.nan
 
     def register_feature(self, feature):
         if isinstance(feature, StaticFeature):
