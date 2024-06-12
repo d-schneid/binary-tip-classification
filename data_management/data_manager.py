@@ -199,26 +199,46 @@ class DataManager:
 
     def analyze_features(self, only_static=False):
         static_features = [feature.get_feature_name() for feature in self.static_features]
-        # static_features = ['reordered_ratio', 'sim_orders_tip_ratio', 'tip_history', 'contains_alcohol']
+        dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
         orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
-        tip = orders_tip_features['tip']
 
         print(f'Analyze of static features:')
+        self._plot_feature_analysis(static_features, 2, orders_tip_features)
 
+        if not only_static:
+            orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
+            print(f'Analyze of dynamic features:')
+            print(dynamic_features)
+            print(self._orders_tip.columns)
+            self._plot_feature_analysis(dynamic_features, 2, orders_tip_features)
+
+    def _plot_feature_analysis(self, list_of_features, number_of_plots_per_row, orders_tip_features):
+        tip = orders_tip_features['tip']
         fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 
-        for i, feature in enumerate(static_features):
-            position = i % 2
+        for i, feature in enumerate(list_of_features):
+            position = i % number_of_plots_per_row
             feature_data = orders_tip_features[feature]
             feature_tip_correlation = feature_data.corr(tip)
 
-            sns.violinplot(data=orders_tip_features, x='tip', y=feature, ax=axs[position])
-            axs[position].set_title(f'{feature} vs tip correlation: {feature_tip_correlation}')
-            axs[position].set_xlabel('tip')
-            axs[position].set_ylabel(feature)
+            if number_of_plots_per_row == 1:
+                sns.violinplot(data=orders_tip_features, x='tip', y=feature, ax=axs)
+                axs.set_title(f'{feature} vs tip correlation: {feature_tip_correlation}')
+                axs.set_xlabel('tip')
+                axs.set_ylabel(feature)
+            else:
+                sns.violinplot(data=orders_tip_features, x='tip', y=feature, ax=axs[position])
+                axs[position].set_title(f'{feature} vs tip correlation: {feature_tip_correlation}')
+                axs[position].set_xlabel('tip')
+                axs[position].set_ylabel(feature)
 
-            if position == 1:
+            if position == number_of_plots_per_row - 1:
                 plt.tight_layout()
                 plt.show()
-                if i != len(static_features) - 1:
-                    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+                if i != len(list_of_features) - 1:
+                    if len(list_of_features) - 1 - i < number_of_plots_per_row:
+                        number_of_plots_per_row = len(list_of_features) - 1 - i
+                        fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
+                    else:
+                        fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
+
