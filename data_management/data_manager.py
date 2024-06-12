@@ -229,7 +229,27 @@ class DataManager:
             self._orders_tip_subset = pd.merge(self._orders_tip_subset, orders_tip_imported[columns_to_merge_dynamic],
                                                on='order_id', how='left')
 
-    def analyze_features(self, only_static=False):
+    def calculate_feature_correlations(self, only_static=False):
+        static_features = [feature.get_feature_name() for feature in self.static_features]
+
+        if not only_static:
+            dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
+            all_features = static_features + dynamic_features
+            orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
+        else:
+            all_features = static_features
+            orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
+
+        correlations = {}
+        for feature in all_features:
+            if feature in orders_tip_features.columns:
+                correlations[feature] = orders_tip_features[feature].corr(orders_tip_features['tip'])
+
+        correlation_df = pd.DataFrame(list(correlations.items()), columns=['Feature', 'Correlation'])
+        correlation_df = correlation_df.sort_values(by='Correlation', ascending=False).reset_index(drop=True)
+        print(correlation_df)
+
+    def visualize_feature_analysis(self, only_static=False):
         static_features = [feature.get_feature_name() for feature in self.static_features]
         dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
         orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
@@ -273,4 +293,3 @@ class DataManager:
                         fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
                     else:
                         fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
-
