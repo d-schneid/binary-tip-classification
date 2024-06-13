@@ -285,8 +285,6 @@ class DataManager:
         if not only_static:
             orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
             print(f'Analyze of dynamic features:')
-            print(dynamic_features)
-            print(self._orders_tip.columns)
             self._plot_feature_analysis(dynamic_features, 2, orders_tip_features)
 
     def _plot_feature_analysis(self, list_of_features, number_of_plots_per_row, orders_tip_features):
