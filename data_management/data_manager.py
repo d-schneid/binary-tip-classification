@@ -316,3 +316,16 @@ class DataManager:
                         fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
                     else:
                         fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
+
+    def analyse_each_feature(self, only_static=False):
+        print(f'Analyze of static features:')
+        for feature in self.static_features:
+            orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
+            feature.analyze_feature(orders_tip_features)
+
+        if not only_static:
+            print(f'Analyze of dynamic features:')
+            for feature in self.dynamic_features:
+                orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
+                feature.analyze_feature(orders_tip_features)
+
