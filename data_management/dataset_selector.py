@@ -19,6 +19,4 @@ class DatasetSelector(BaseEstimator, TransformerMixin):
 
         if X.shape != Xt.shape:
             raise ValueError(f'Shape mismatch: {X.shape} != {Xt.shape}')
-
-        print(f'Transformation: {X.shape} -> {Xt.shape}')
         return Xt
