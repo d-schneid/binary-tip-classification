@@ -54,3 +54,20 @@ def estimate_accuracy(grid_search_clf):
     plt.show()
 
     return y_pred[0][0]
+
+
+def eval_logreg(grid_search_clf, features):
+    best_estimator = grid_search_clf.best_estimator_
+    logreg_model = best_estimator.named_steps['logreg']
+    coefficients = logreg_model.coef_
+    print("Coefficients:", coefficients)
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(features, coefficients[0])
+    plt.xlabel('Features')
+    plt.ylabel('Coefficient Value')
+    plt.title('Coefficients of Linear Model')
+    plt.xticks(rotation=45)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
