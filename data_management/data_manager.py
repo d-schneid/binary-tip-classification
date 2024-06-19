@@ -47,11 +47,10 @@ class DataManager:
 
     def get_orders_tip_train(self, complete=False):
         if complete:
-            return self._orders_tip[self._orders_tip['tip'].notnull()].reset_index(drop=True)
+            return self._orders_tip[self._orders_tip['eval_set'] != 'train'].reset_index(drop=True)
         else:
-            return self._orders_tip_subset[self._orders_tip_subset['tip'].notnull()].reset_index(drop=True)
+            return self._orders_tip_subset[self._orders_tip_subset['eval_set'] != 'train'].reset_index(drop=True)
 
-    # TODO: Adjust to retrieve the correct test set
     def get_orders_tip_test(self, complete=False):
         if complete:
             return self._orders_tip[self._orders_tip['eval_set'] == 'train']
