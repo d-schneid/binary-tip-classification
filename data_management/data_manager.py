@@ -248,7 +248,8 @@ class DataManager:
                 correlations[feature] = orders_tip_features[feature].corr(orders_tip_features['tip'])
 
         correlation_df = pd.DataFrame(list(correlations.items()), columns=['Feature', 'Correlation'])
-        correlation_df = correlation_df.sort_values(by='Correlation', ascending=False).reset_index(drop=True)
+
+        correlation_df = correlation_df.sort_values(by='Correlation', key=abs, ascending=False).reset_index(drop=True)
         print(correlation_df)
 
     def visualize_correlation_between_features(self, only_static=False):
