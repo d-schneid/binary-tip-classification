@@ -80,9 +80,11 @@ class Feature(ABC):
         feature_tip_rate = orders_tip_features.groupby(self.feature)['tip'].mean().reset_index()
         feature_tip_rate.columns = [self.feature, 'tip_rate']
 
-        sns.histplot(data=orders_tip_features, x=self.feature, hue='tip', bins=10, element='step', stat='density',
-                     ax=ax,
-                     common_norm=False)
+        #sns.histplot(data=orders_tip_features, x=self.feature, hue='tip', bins=5, element='step', stat='density',
+        #             ax=ax,
+        #             common_norm=False)
+        sns.barplot(data=feature_tip_rate, x=self.feature, y='tip_rate', ax=ax)
+        #ax.set_xticks([0, 1])
         ax.set_xlabel(self.feature)
         ax.set_ylabel('tip rate')
         ax.set_title(f'{self.feature} vs tip rate')
@@ -105,7 +107,7 @@ class Feature(ABC):
 
     def _create_tip_rate_plot_steady(self, orders_tip_features, ax):
         orders_tip_features = orders_tip_features.copy()
-        num_bins = 10
+        num_bins = 30
         orders_tip_features['binned_feature'] = pd.cut(orders_tip_features[self.feature], bins=num_bins)
         feature_tip_rate = orders_tip_features.groupby('binned_feature', observed=True)['tip'].mean().reset_index()
         feature_tip_rate.columns = ['binned_feature', 'tip_rate']
