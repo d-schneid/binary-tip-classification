@@ -7,6 +7,7 @@ class MeanOrderedRate(StaticFeature):
 
     def __init__(self):
         super().__init__('mean_ordered_rate')
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         orders_joined_sorted = self.orders_joined.sort_values(by=['user_id', 'order_number'])
@@ -17,6 +18,3 @@ class MeanOrderedRate(StaticFeature):
         mean_ordered_rate = orders_joined_sorted.groupby('order_id')['ordered_rate'].mean().reset_index()
         mean_ordered_rate = mean_ordered_rate.rename(columns={'ordered_rate': self.feature})
         self.orders_tip = pd.merge(self.orders_tip, mean_ordered_rate, on='order_id', how='left')
-
-    def _analyze_feature(self):
-        pass

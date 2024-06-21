@@ -10,6 +10,7 @@ class LastTipSequence(StaticFeature):
 
     def __init__(self):
         super().__init__('last_tip_sequence')
+        self.feature_type = self.DISCRETE_FEATURE
 
     def _compute_feature(self):
         calculated_tip_sequence = (self.orders_tip.groupby('user_id')
@@ -35,6 +36,3 @@ class LastTipSequence(StaticFeature):
                 last_tip_sequence = 0
 
         return user_orders
-
-    def _analyze_feature(self):
-        pass

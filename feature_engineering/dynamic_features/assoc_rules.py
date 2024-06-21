@@ -15,6 +15,7 @@ class AssocRules(DynamicFeature):
         self._min_confidence = min_confidence
         self._tip_indicator = -1
         self._assoc_rules = None
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         transactions = (self.orders_joined[['order_id', 'tip', self._id_col]].groupby('order_id').
@@ -73,24 +74,14 @@ class AssocRules(DynamicFeature):
             assoc_rules_copy[id_] = assoc_rules_copy['antecedents'].apply(lambda rule: int(id_ in rule))
         return assoc_rules_copy.drop(['antecedents', 'confidence'], axis=1)
 
-    @abstractmethod
-    def _analyze_feature(self):
-        pass
-
 
 class AssocRulesDepartments(AssocRules):
 
     def __init__(self, min_support=0.001, min_confidence=0.0):
         super().__init__('tip_rate_assoc_rules_depts', 'department_id', min_support, min_confidence)
 
-    def _analyze_feature(self):
-        pass
-
 
 class AssocRulesAisles(AssocRules):
 
     def __init__(self, min_support=0.001, min_confidence=0.0):
         super().__init__('tip_rate_assoc_rules_aisles', 'aisle_id', min_support, min_confidence)
-
-    def _analyze_feature(self):
-        pass

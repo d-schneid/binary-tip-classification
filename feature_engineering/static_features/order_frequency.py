@@ -7,6 +7,7 @@ class OrderFrequency(StaticFeature):
 
     def __init__(self):
         super().__init__('order_frequency')
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         # ensure NaN for accurate computation
@@ -15,5 +16,3 @@ class OrderFrequency(StaticFeature):
                                          .mean().reset_index(level=0, drop=True))
         self.orders_tip.loc[self.orders_tip['order_number'] == 1, self.feature] = np.nan
 
-    def _analyze_feature(self):
-        pass

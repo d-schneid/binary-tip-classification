@@ -7,6 +7,7 @@ class SimOrdersTipRatio(StaticFeature):
 
     def __init__(self):
         super().__init__('sim_orders_tip_ratio')
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         order_with_grouped_products = (self.orders_joined.groupby(['user_id', 'order_number', 'order_id']).agg(
@@ -53,6 +54,3 @@ class SimOrdersTipRatio(StaticFeature):
         intersection_size = len(products1.intersection(products2))
         union_size = len(products1.union(products2))
         return intersection_size / union_size if union_size != 0 else 0
-
-    def _analyze_feature(self):
-        pass

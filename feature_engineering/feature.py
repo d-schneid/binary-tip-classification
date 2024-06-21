@@ -10,6 +10,10 @@ class Feature(ABC):
         self.orders_tip = None
         self.orders_joined = None
         self.feature = name
+        self.feature_type = None
+        self.BINARY_FEATURE = 'binary'
+        self.DISCRETE_FEATURE = 'discrete'
+        self.STEADY_FEATURE = 'steady'
 
     def compute_feature(self):
         self._handle_missing_values()
@@ -39,60 +43,95 @@ class Feature(ABC):
         pass
 
     def analyze_feature(self, orders_tip_features):
+        self._analyze_feature(orders_tip_features)
+
+    def _analyze_feature(self, orders_tip_features):
         tip = orders_tip_features['tip']
         feature_data = orders_tip_features[self.feature]
-        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
 
-        # Print Correlation
         feature_tip_correlation = feature_data.corr(tip)
         print(f'Correlation between {self.feature} and tip: {feature_tip_correlation}')
 
-        # Violinplot
-        sns.violinplot(data=orders_tip_features, x='tip', y=self.feature, ax=ax1)
-        ax1.set_title(f'{self.feature} vs tip')
-        ax1.set_xlabel('tip')
-        ax1.set_ylabel(self.feature)
-
-        unique_values = orders_tip_features[self.feature].unique()
-        tip_data = orders_tip_features[orders_tip_features['tip'] == 1]
-        no_tip_data = orders_tip_features[orders_tip_features['tip'] == 0]
-        if len(unique_values) > 2:
-            # linegraph
-            sns.kdeplot(tip_data[self.feature],
-                        linewidth=3,
-                        label='survived',
-                        color='green',
-                        ax=ax2
-                        )
-            sns.kdeplot(no_tip_data[self.feature],
-                        linewidth=3,
-                        label='survived',
-                        color='red',
-                        ax=ax2)
-            ax2.set_title(f'{self.feature} vs density of tip & no tip')
+        if self.feature_type == self.BINARY_FEATURE:
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+            self._create_violin_plot(orders_tip_features, ax1)
+            self._create_box_plot(orders_tip_features, ax2)
+        elif self.feature_type == self.STEADY_FEATURE:
+            fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+            self._create_violin_plot(orders_tip_features, ax1)
+            self._create_density_plot(orders_tip_features, ax2)
+            self._create_tip_rate_plot_steady(orders_tip_features, ax3)
         else:
-            cross_tab = pd.crosstab(index=orders_tip_features[self.feature],
-                                    columns=orders_tip_features['tip'],
-                                    margins=True)
-            no_tip_data = cross_tab[0][:-1]
-            tip_data = cross_tab[1][:-1]
-            ax2.bar(cross_tab.index[:-1].astype(int), tip_data, color='green', label='Tip', alpha=0.5)
-            ax2.bar(cross_tab.index[:-1].astype(int), no_tip_data, color='red', label='No Tip', alpha=0.5)
-            ax2.set_xlabel(self.feature)
-            ax2.set_ylabel("Order Frequency")
-            ax2.set_title(f"Frequency of Orders by {self.feature}")
-            ax2.legend()
-
-        sns.histplot(data=orders_tip_features, x=self.feature, hue='tip', bins=10, element='step', stat='density', ax=ax3,
-                     common_norm=False)
-        ax3.set_title(f'{self.feature} vs density of tip & no tip')
+            fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+            self._create_violin_plot(orders_tip_features, ax1)
+            self._create_density_plot(orders_tip_features, ax2)
+            self._create_tip_rate_plot_discrete(orders_tip_features, ax3)
 
         plt.tight_layout()
         plt.show()
 
-    @abstractmethod
-    def _analyze_feature(self):
-        pass
+    def _create_violin_plot(self, orders_tip_features, ax):
+        sns.violinplot(data=orders_tip_features, x='tip', y=self.feature, ax=ax)
+        ax.set_title(f'{self.feature} vs tip')
+        ax.set_xlabel('tip')
+        ax.set_ylabel(self.feature)
+
+    def _create_box_plot(self, orders_tip_features, ax):
+        feature_tip_rate = orders_tip_features.groupby(self.feature)['tip'].mean().reset_index()
+        feature_tip_rate.columns = [self.feature, 'tip_rate']
+
+        sns.histplot(data=orders_tip_features, x=self.feature, hue='tip', bins=10, element='step', stat='density',
+                     ax=ax,
+                     common_norm=False)
+        ax.set_xlabel(self.feature)
+        ax.set_ylabel('tip rate')
+        ax.set_title(f'{self.feature} vs tip rate')
+
+    def _create_density_plot(self, orders_tip_features, ax):
+        tip_data = orders_tip_features[orders_tip_features['tip'] == 1]
+        no_tip_data = orders_tip_features[orders_tip_features['tip'] == 0]
+        sns.kdeplot(tip_data[self.feature],
+                    linewidth=3,
+                    label='survived',
+                    color='green',
+                    ax=ax
+                    )
+        sns.kdeplot(no_tip_data[self.feature],
+                    linewidth=3,
+                    label='survived',
+                    color='red',
+                    ax=ax)
+        ax.set_title(f'{self.feature} vs density of tip & no tip')
+
+    def _create_tip_rate_plot_steady(self, orders_tip_features, ax):
+        orders_tip_features = orders_tip_features.copy()
+        num_bins = 10
+        orders_tip_features['binned_feature'] = pd.cut(orders_tip_features[self.feature], bins=num_bins)
+        feature_tip_rate = orders_tip_features.groupby('binned_feature', observed=True)['tip'].mean().reset_index()
+        feature_tip_rate.columns = ['binned_feature', 'tip_rate']
+        feature_tip_rate['feature_bin_mid'] = feature_tip_rate['binned_feature'].apply(lambda x: x.mid)
+
+        sns.lineplot(data=feature_tip_rate,
+                     x='feature_bin_mid',
+                     y='tip_rate',
+                     marker='o',
+                     ax=ax)
+
+        ax.set_xlabel(self.feature)
+        ax.set_ylabel('tip rate')
+        ax.set_title(f'{self.feature} vs tip rate')
+
+    def _create_tip_rate_plot_discrete(self, orders_tip_features, ax):
+        feature_tip_rate = orders_tip_features.groupby(self.feature)['tip'].mean().reset_index()
+        feature_tip_rate.columns = [self.feature, 'tip_rate']
+
+        sns.lineplot(data=feature_tip_rate,
+                     x=self.feature,
+                     y='tip_rate',
+                     ax=ax)
+        ax.set_xlabel(self.feature)
+        ax.set_ylabel('tip rate')
+        ax.set_title(f'{self.feature} vs tip rate')
 
 
 class StaticFeature(Feature):
@@ -104,10 +143,6 @@ class StaticFeature(Feature):
     def _compute_feature(self):
         pass
 
-    @abstractmethod
-    def _analyze_feature(self):
-        pass
-
 
 class DynamicFeature(Feature):
 
@@ -116,8 +151,4 @@ class DynamicFeature(Feature):
 
     @abstractmethod
     def _compute_feature(self):
-        pass
-
-    @abstractmethod
-    def _analyze_feature(self):
         pass

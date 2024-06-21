@@ -8,6 +8,7 @@ class PrevTippedProductsRatio(StaticFeature):
 
     def __init__(self):
         super().__init__('prev_tipped_products_ratio')
+        self.feature_type = self.STEADY_FEATURE
 
     def _prev_tipped_products_ratio_calculation(self, user_orders):
         cumulative_products = set()
@@ -30,5 +31,3 @@ class PrevTippedProductsRatio(StaticFeature):
 
         self.orders_tip.loc[self.orders_tip['order_number'] == 1, self.feature] = np.nan
 
-    def _analyze_feature(self):
-        pass

@@ -9,6 +9,7 @@ class DaysSinceTip(StaticFeature):
     def __init__(self, name='days_since_tip'):
         super().__init__(name)
         self._feature = 'days_since_tip'
+        self.features = self.DISCRETE_FEATURE
 
     def _compute_feature(self):
         orders_tip_copy = self._compute_days_since_tip()
@@ -41,14 +42,12 @@ class DaysSinceTip(StaticFeature):
                                                   np.nan)
         return orders_tip_copy
 
-    def _analyze_feature(self):
-        pass
-
 
 class RelDaysSinceTip(DaysSinceTip):
 
     def __init__(self):
         super().__init__('rel_days_since_tip')
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         orders_tip_copy = self._compute_days_since_tip()

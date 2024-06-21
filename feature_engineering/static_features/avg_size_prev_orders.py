@@ -9,6 +9,7 @@ class AvgSizePrevOrders(StaticFeature):
 
     def __init__(self):
         super().__init__('avg_size_prev_orders')
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         orders = self.orders_joined.copy()
@@ -24,6 +25,3 @@ class AvgSizePrevOrders(StaticFeature):
         orders[self.feature] = orders[self.feature].replace([np.inf, -np.inf], np.nan)
 
         self.orders_tip = pd.merge(self.orders_tip, orders[['order_id', self.feature]], on='order_id', how='left')
-
-    def _analyze_feature(self):
-        pass

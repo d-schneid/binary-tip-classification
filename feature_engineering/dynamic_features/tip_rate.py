@@ -9,6 +9,7 @@ class TipRate(DynamicFeature):
     def __init__(self, name, id_name):
         super().__init__(name)
         self._id = id_name
+        self.feature_type = self.STEADY_FEATURE
 
     def _compute_feature(self):
         orders_joined_copy = self.orders_joined.copy()
@@ -36,33 +37,18 @@ class TipRate(DynamicFeature):
         product_tip_rate_by_order.columns = ['order_id', self.feature]
         self.orders_tip = pd.merge(self.orders_tip, product_tip_rate_by_order, on='order_id', how='left')
 
-    @abstractmethod
-    def _analyze_feature(self):
-        pass
-
-
 class ProductTipRate(TipRate):
 
     def __init__(self):
         super().__init__('product_tip_rate', 'product_id')
-
-    def _analyze_feature(self):
-        pass
-
 
 class DepartmentTipRate(TipRate):
 
     def __init__(self):
         super().__init__('dept_tip_rate', 'department_id')
 
-    def _analyze_feature(self):
-        pass
-
 
 class AisleTipRate(TipRate):
 
     def __init__(self):
         super().__init__('aisle_tip_rate', 'aisle_id')
-
-    def _analyze_feature(self):
-        pass
