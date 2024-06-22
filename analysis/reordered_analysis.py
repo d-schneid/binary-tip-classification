@@ -1,6 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-
+import seaborn as sns
 from analysis import Analysis
 
 
@@ -20,11 +20,12 @@ class ReorderedAnalysis(Analysis):
         self._plot_scatter(self.tip_probabilities, self.reorder_probabilities, save_plots)
 
     def _plot_scatter(self, tip_probabilities, reorder_probabilities, save_plots=False):
-        fig, ax = plt.subplots(figsize=(12, 8))
-        ax.scatter(reorder_probabilities, tip_probabilities, alpha=0.6, edgecolors='w')
-        ax.set_xlabel('Reorder Probability')
+        fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+
+        sns.kdeplot(x=reorder_probabilities, y=tip_probabilities, cmap='viridis', fill=True, bw_adjust=.5, ax=ax)
+        ax.set_xlabel('Reorder Rate')
         ax.set_ylabel('Tip Probability')
-        ax.set_title('Tip Probability vs Reorder Probability by Product')
+        plt.title('Tip Probability vs Reorder Rate by Product')
 
         plt.show()
 
