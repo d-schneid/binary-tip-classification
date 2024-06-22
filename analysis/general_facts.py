@@ -24,6 +24,7 @@ class GeneralFacts(Analysis):
         print(f"Total amount of products       : {self.orders_joined['product_id'].nunique()}")
         print(f"Average products / order       : {self.orders_joined.groupby('order_id')['product_id'].size().mean()}")
         print(f"Average order amount / product : {self.orders_joined['product_id'].value_counts().mean()}")
+        print(f"Median order amount / product  : {self.orders_joined['product_id'].value_counts().median()}")
 
         print(f"----------\n")
         print(f"Department specific analysis:")

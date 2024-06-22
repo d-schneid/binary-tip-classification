@@ -34,7 +34,7 @@ class Product(Analysis):
 
         cross_tab_product_normalized = cross_tab_product_normalized.drop('All', axis=0)
         cross_tab_product = cross_tab_product.drop('All', axis=0)
-        
+
         self.mean_order_frequency = cross_tab_product['All'].mean()
         self.median_order_frequency = cross_tab_product['All'].median()
 
@@ -49,7 +49,6 @@ class Product(Analysis):
     def _show_results(self, save_plots=False):
         self._plot_distribution(self.product_probability_freq, weighted=False, save_plots=save_plots)
         self._plot_distribution(self.product_probability_freq, weighted=True, save_plots=save_plots)
-        self._print_general_facts()
         self._plot_partial_distribution(self.product_probability_freq, 0.8, 1.0, 20, save_plots=save_plots)
         self._print_upper_bound_statistics()
         self._plot_partial_distribution(self.product_probability_freq, 0.0, 0.2, 20, save_plots=save_plots)
@@ -161,10 +160,6 @@ class Product(Analysis):
 
         if save_plots:
             self._save_plot(fig, 'product_distribution_no_tip.png')
-
-    def _print_general_facts(self):
-        print(f"Mean Order Frequency: {self.mean_order_frequency:.2f}")
-        print(f"Median Order Frequency: {self.median_order_frequency:.2f}")
 
     def _print_upper_bound_statistics(self):
         print("Top 5 Non-Alcohol Products with 100% Tip Rate sorted by Order Frequency")
