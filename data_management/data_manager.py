@@ -236,10 +236,10 @@ class DataManager:
         if not only_static:
             dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
             all_features = static_features + dynamic_features
-            orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
+            orders_tip_features = self._orders_tip_subset
         else:
             all_features = static_features
-            orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
+            orders_tip_features = self._orders_tip
 
         correlations = {}
         for feature in all_features:
@@ -328,4 +328,3 @@ class DataManager:
             for feature in self.dynamic_features:
                 orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
                 feature.analyze_feature(orders_tip_features)
-
