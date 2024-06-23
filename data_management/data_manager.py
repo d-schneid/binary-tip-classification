@@ -5,6 +5,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
 
 from feature_engineering import StaticFeature, DynamicFeature
 
@@ -247,75 +249,17 @@ class DataManager:
                 correlations[feature] = orders_tip_features[feature].corr(orders_tip_features['tip'])
 
         correlation_df = pd.DataFrame(list(correlations.items()), columns=['Feature', 'Correlation'])
-
         correlation_df = correlation_df.sort_values(by='Correlation', key=abs, ascending=False).reset_index(drop=True)
-        print(correlation_df)
 
-    def visualize_correlation_between_features(self, only_static=False):
-        static_features = [feature.get_feature_name() for feature in self.static_features]
-        static_features.append('order_number')
-        static_features.append('days_since_prior_order')
-
-        if not only_static:
-            dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
-            orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
-            all_features = static_features + dynamic_features
-        else:
-            orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
-            all_features = static_features
-
-        # print(all_features)
-
-        filtered_data = orders_tip_features[all_features]
-        print(filtered_data.corr())
-        # scatter_matrix = pd.plotting.scatter_matrix(filtered_data, figsize=(12, 12), diagonal='kde')
-
-        # plt.show()
-
-    def visualize_feature_analysis(self, only_static=False):
-        static_features = [feature.get_feature_name() for feature in self.static_features]
-        static_features.append('order_number')
-        static_features.append('days_since_prior_order')
-        dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
-        orders_tip_features = self._orders_tip[self._orders_tip['order_number'] != 1]
-
-        print(f'Analyze of static features:')
-        self._plot_feature_analysis(static_features, 2, orders_tip_features)
-
-        if not only_static:
-            orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
-            print(f'Analyze of dynamic features:')
-            self._plot_feature_analysis(dynamic_features, 2, orders_tip_features)
-
-    def _plot_feature_analysis(self, list_of_features, number_of_plots_per_row, orders_tip_features):
-        tip = orders_tip_features['tip']
-        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-
-        for i, feature in enumerate(list_of_features):
-            position = i % number_of_plots_per_row
-            feature_data = orders_tip_features[feature]
-            feature_tip_correlation = feature_data.corr(tip)
-
-            if number_of_plots_per_row == 1:
-                sns.violinplot(data=orders_tip_features, x='tip', y=feature, ax=axs)
-                axs.set_title(f'{feature} vs tip correlation: {feature_tip_correlation}')
-                axs.set_xlabel('tip')
-                axs.set_ylabel(feature)
-            else:
-                sns.violinplot(data=orders_tip_features, x='tip', y=feature, ax=axs[position])
-                axs[position].set_title(f'{feature} vs tip correlation: {feature_tip_correlation}')
-                axs[position].set_xlabel('tip')
-                axs[position].set_ylabel(feature)
-
-            if position == number_of_plots_per_row - 1:
-                plt.tight_layout()
-                plt.show()
-                if i != len(list_of_features) - 1:
-                    if len(list_of_features) - 1 - i < number_of_plots_per_row:
-                        number_of_plots_per_row = len(list_of_features) - 1 - i
-                        fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
-                    else:
-                        fig, axs = plt.subplots(1, number_of_plots_per_row, figsize=(15, 5))
+        plt.figure(figsize=(15, 7))
+        plt.bar(correlation_df['Feature'], correlation_df['Correlation'])
+        plt.xlabel('Features')
+        plt.ylabel('Correlation Value')
+        plt.title('Correlations of features')
+        plt.xticks(rotation=70)
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
 
     def analyse_each_feature(self, only_static=False):
         print(f'Analyze of static features:')
@@ -328,3 +272,38 @@ class DataManager:
             for feature in self.dynamic_features:
                 orders_tip_features = self._orders_tip_subset[self._orders_tip_subset['order_number'] != 1]
                 feature.analyze_feature(orders_tip_features)
+
+    def analyse_linear_regression_coefficients(self):
+        orders_tip_features = self.get_orders_tip_train()
+        orders_tip_features = orders_tip_features[orders_tip_features['order_number'] != 1]
+        static_features = [feature.get_feature_name() for feature in self.static_features]
+        static_features.append('order_number')
+        dynamic_features = [feature.get_feature_name() for feature in self.dynamic_features]
+
+        all_features = static_features + dynamic_features
+        all_features.remove('days_since_tip')
+        all_features.remove('rel_days_since_tip')
+
+        X = orders_tip_features[all_features]
+        y = orders_tip_features['tip']
+
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+
+        model = LinearRegression()
+        model.fit(X_scaled, y)
+
+        coefficients = model.coef_
+        feature_coefficients = pd.Series(coefficients, index=X.columns)
+        feature_coefficients_sorted = feature_coefficients.sort_values(ascending=False, key=abs)
+
+        plt.figure(figsize=(15, 7))
+        plt.bar(feature_coefficients_sorted.index, feature_coefficients_sorted)
+        plt.xlabel('Features')
+        plt.ylabel('Coefficient Value')
+        plt.title('Coefficients of Linear Model')
+        plt.xticks(rotation=70)
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+
