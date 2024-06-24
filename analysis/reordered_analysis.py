@@ -20,7 +20,7 @@ class ReorderedAnalysis(Analysis):
         self._plot_scatter(self.tip_probabilities, self.reorder_probabilities, save_plots)
 
     def _plot_scatter(self, tip_probabilities, reorder_probabilities, save_plots=False):
-        fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+        fig, ax = plt.subplots(1, 1, figsize=(12, 6))
 
         sns.kdeplot(x=reorder_probabilities, y=tip_probabilities, cmap='viridis', fill=True, bw_adjust=.5, ax=ax)
         ax.set_xlabel('Reordered Rate')
