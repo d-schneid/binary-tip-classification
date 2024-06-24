@@ -34,27 +34,6 @@ class ProductCartOrder(Analysis):
             orders_joined_card_norm.groupby(['product_id', 'binned_normalized_add_to_cart_order'], observed=True)['tip']
             .mean().reset_index())
 
-        # plot 2
-        #product_card_order_tip_rate_first_bin = orders_joined_card_norm[
-        #    orders_joined_card_norm['binned_normalized_add_to_cart_order'] == 0.05]
-
-        #self.product_card_normalized = (pd.crosstab(index=product_card_order_tip_rate_first_bin['product_id'],
-        #                                            columns=product_card_order_tip_rate_first_bin['tip'],
-        #                                            margins=True,
-        #                                            normalize='index').sort_values(by=1, ascending=False))
-
-        # plot 3 - standard derivation
-        #product_tip_rate = orders_joined_card_norm.groupby('product_id')['tip'].mean().reset_index()
-        #product_tip_rate.columns = ['product_id', 'product_tip_rate']
-
-        #product_card_order_tip_rates = pd.merge(self.product_card_order_tip_rate, product_tip_rate, on='product_id',
-        #                                        how='left')
-
-        #self.product_tip_standard_deviation = product_card_order_tip_rates.groupby('product_id').apply(
-        #    self._calculate_variance, include_groups=False).reset_index()
-
-        #self.product_tip_standard_deviation.columns = ['product_id', 'product_tip_bin_variance']
-
     def _show_results(self, save_plots=False):
         self._plot_cross_tab(self.product_card_order_tip_rate, self.product_tip_standard_deviation, save_plots)
         # self._plot_first_bin_tip_rate(self.product_card_normalized)
@@ -76,12 +55,6 @@ class ProductCartOrder(Analysis):
         ax.set_xlabel('Normalized Add to Cart Order')
         ax.set_ylabel('Distribution of Tip Probabilities')
         ax.set_title('Tip Probability Distribution by Normalized Add to Cart Order')
-
-        # Figure 2 Standard Deviation Histogram
-        # ax2.hist(product_tip_standard_deviation['product_tip_bin_variance'], bins=20, color='C0', edgecolor='black', alpha=0.7)
-        # ax2.set_xlabel('Normalized Add to Cart Order standard deviation')
-        # ax2.set_ylabel('Amount of products')
-        # ax2.set_title('Distribution of standard deviation')
 
         # Show the plot
         plt.tight_layout()
