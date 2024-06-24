@@ -22,7 +22,7 @@ class AssocRules(Analysis):
 
 	def _analyze(self):
 		transactions = (self.orders_joined[['order_id', 'tip', self._id_col]].groupby('order_id').
-				  apply(self._build_transaction).tolist())
+				  apply(self._build_transaction, include_groups=False).tolist())
 		te = TransactionEncoder()
 		transactions_df = pd.DataFrame(te.fit(transactions).transform(transactions), columns=te.columns_)
 
