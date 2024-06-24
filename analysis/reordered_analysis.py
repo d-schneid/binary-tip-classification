@@ -23,7 +23,7 @@ class ReorderedAnalysis(Analysis):
         fig, ax = plt.subplots(1, 1, figsize=(12, 8))
 
         sns.kdeplot(x=reorder_probabilities, y=tip_probabilities, cmap='viridis', fill=True, bw_adjust=.5, ax=ax)
-        ax.set_xlabel('Reorder Rate')
+        ax.set_xlabel('Reordered Rate')
         ax.set_ylabel('Tip Probability')
         plt.title('Tip Probability vs Reorder Rate by Product')
 
