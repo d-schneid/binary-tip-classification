@@ -53,17 +53,14 @@ class Feature(ABC):
         print(f'Correlation between {self.feature} and tip: {feature_tip_correlation}')
 
         if self.feature_type == self.BINARY_FEATURE:
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
-            self._create_violin_plot(orders_tip_features, ax1)
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7, 5))
             self._create_box_plot(orders_tip_features, ax2)
         elif self.feature_type == self.STEADY_FEATURE:
             fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
-            self._create_violin_plot(orders_tip_features, ax1)
             self._create_density_plot(orders_tip_features, ax2)
             self._create_tip_rate_plot_steady(orders_tip_features, ax3)
         else:
             fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
-            self._create_violin_plot(orders_tip_features, ax1)
             self._create_density_plot(orders_tip_features, ax2)
             self._create_tip_rate_plot_discrete(orders_tip_features, ax3)
 
@@ -80,11 +77,7 @@ class Feature(ABC):
         feature_tip_rate = orders_tip_features.groupby(self.feature)['tip'].mean().reset_index()
         feature_tip_rate.columns = [self.feature, 'tip_rate']
 
-        #sns.histplot(data=orders_tip_features, x=self.feature, hue='tip', bins=5, element='step', stat='density',
-        #             ax=ax,
-        #             common_norm=False)
         sns.barplot(data=feature_tip_rate, x=self.feature, y='tip_rate', ax=ax)
-        #ax.set_xticks([0, 1])
         ax.set_xlabel(self.feature)
         ax.set_ylabel('tip rate')
         ax.set_title(f'{self.feature} vs tip rate')
