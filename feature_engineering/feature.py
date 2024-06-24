@@ -53,16 +53,16 @@ class Feature(ABC):
         print(f'Correlation between {self.feature} and tip: {feature_tip_correlation}')
 
         if self.feature_type == self.BINARY_FEATURE:
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7, 5))
-            self._create_box_plot(orders_tip_features, ax2)
+            fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+            self._create_box_plot(orders_tip_features, ax)
         elif self.feature_type == self.STEADY_FEATURE:
-            fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
-            self._create_density_plot(orders_tip_features, ax2)
-            self._create_tip_rate_plot_steady(orders_tip_features, ax3)
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+            self._create_density_plot(orders_tip_features, ax1)
+            self._create_tip_rate_plot_steady(orders_tip_features, ax2)
         else:
-            fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
-            self._create_density_plot(orders_tip_features, ax2)
-            self._create_tip_rate_plot_discrete(orders_tip_features, ax3)
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+            self._create_density_plot(orders_tip_features, ax1)
+            self._create_tip_rate_plot_discrete(orders_tip_features, ax2)
 
         plt.tight_layout()
         plt.show()
