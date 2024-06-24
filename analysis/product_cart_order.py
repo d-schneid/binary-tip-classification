@@ -7,7 +7,7 @@ import math
 from analysis import Analysis
 
 
-class ProductCardOrder(Analysis):
+class ProductCartOrder(Analysis):
 
     def __init__(self, data_manager):
         super().__init__(data_manager)
