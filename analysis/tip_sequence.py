@@ -16,21 +16,22 @@ class TipSequence(Analysis):
 	def _analyze(self):
 		# first analysis
 		user_mean_tip_streaks = (self.orders_tip[['user_id', 'tip']].groupby('user_id').
-								 apply(self._compute_user_mean_tip_streak).reset_index())
+								 apply(self._compute_user_mean_tip_streak, include_groups=False).reset_index())
 		user_mean_tip_streaks.columns = ['user_id', 'mean_tip_streak']
 
 		user_num_orders = self.orders_tip.groupby('user_id')[['order_number']].max().reset_index()
 		user_num_orders.columns = ['user_id', 'num_orders']
 		user_total_tips = self.orders_tip.groupby('user_id')['tip'].sum().reset_index()
 		user_total_tips.columns = ['user_id', 'num_tips']
-		user_var_tip_streaks = self.orders_tip.groupby('user_id').apply(self._compute_user_var_tip_streak).reset_index()
+		user_var_tip_streaks = (self.orders_tip.groupby('user_id').
+								apply(self._compute_user_var_tip_streak, include_groups=False).reset_index())
 		user_var_tip_streaks.columns = ['user_id', 'var_tip_streak']
 
 		user_mean_tip_streaks = pd.merge(user_mean_tip_streaks, user_num_orders)
 		user_mean_tip_streaks = pd.merge(user_mean_tip_streaks, user_total_tips)
 		user_mean_tip_streaks = pd.merge(user_mean_tip_streaks, user_var_tip_streaks)
 		user_mean_tip_streaks['streaks_per_order'] = user_mean_tip_streaks['mean_tip_streak'] / user_mean_tip_streaks['num_orders']
-		user_mean_tip_streaks = user_mean_tip_streaks.fillna(-1)
+		user_mean_tip_streaks = user_mean_tip_streaks.infer_objects(copy=False).fillna(-1)
 		self._user_mean_tip_streaks = user_mean_tip_streaks
 
 		# second analysis
