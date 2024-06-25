@@ -62,27 +62,27 @@ class TipSequence(Analysis):
 		return np.var(tip_streaks) if tip_streaks else -1
 
 	def _show_results(self, save_plots=False):
-		fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(20, 6))
+		fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 6))
 
 		ax1.scatter(self._user_mean_tip_streaks['num_orders'], self._user_mean_tip_streaks['mean_tip_streak'])
-		ax1.set_xlabel('Number of total orders')
+		ax1.set_xlabel('Total number of orders')
 		ax1.set_ylabel('Mean tip streak')
-		ax1.set_title('Number of Total Orders for a User and his Mean Tip Streak Across all of his Orders')
+		ax1.set_title('Total Number of Orders for each User and the corresponding Mean Tip Streak Across all respective Orders')
 
 		ax2.hist(self._user_mean_tip_streaks['var_tip_streak'], bins='auto', edgecolor='black')
 		ax2.set_xlabel('Variance of tip streak')
 		ax2.set_xlim([-1, 20])
 		ax2.set_ylabel('Frequency')
-		ax2.set_title('Variance of Tip Streak for a User across all of his Orders')
+		ax2.set_title('Histogram of Tip Streak Variance of Users across all respective Orders')
 
-		ax3.scatter(self._mean_tip_streak_per_order_num['order_number'],
-					self._mean_tip_streak_per_order_num['mean_tip_streak_users'], c='blue', label='Mean tip streak')
-		ax3.scatter(self._mean_tip_streak_per_order_num['order_number'],
-					self._mean_tip_streak_per_order_num['var_tip_streak_users'], c='red', label='Variance of tip streak')
-		ax3.set_title('Mean/Variance of Tip Streaks up to each Order Number across all Users')
-		ax3.set_xlabel('Order number')
-		ax3.set_ylabel('Value')
-		ax3.legend(loc='upper left')
+		#ax3.scatter(self._mean_tip_streak_per_order_num['order_number'],
+		#			self._mean_tip_streak_per_order_num['mean_tip_streak_users'], c='blue', label='Mean tip streak')
+		#ax3.scatter(self._mean_tip_streak_per_order_num['order_number'],
+		#			self._mean_tip_streak_per_order_num['var_tip_streak_users'], c='red', label='Variance of tip streak')
+		#ax3.set_title('Mean/Variance of Tip Streaks up to each Order Number across all Users')
+		#ax3.set_xlabel('Order number')
+		#ax3.set_ylabel('Value')
+		#ax3.legend(loc='upper left')
 
 		plt.tight_layout()
 		plt.show()
